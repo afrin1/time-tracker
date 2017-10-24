@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
@@ -35,28 +36,32 @@ import java.util.Map;
 
 public class DailyStats extends Fragment {
 
-    protected BarChart mChart;
+    private BarChart barChart;
 
-    View RootView;
+    private TextView startTime;
+    private TextView endTime;
 
-    public int FB = AppHelper.FB;
-    public int WA = AppHelper.WA;
-    public int FB_MSG = AppHelper.FB_MSG;
-    public int INST = AppHelper.INST;
+    private View rootView;
+
+    private int FB = AppHelper.FB;
+    private int WA = AppHelper.WA;
+    private int FB_MSG = AppHelper.FB_MSG;
+    private int INST = AppHelper.INST;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        RootView = inflater.inflate(R.layout.fragment_daily, container, false);
-        return RootView;
+        rootView = inflater.inflate(R.layout.fragment_stats, container, false);
+        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        mChart = (BarChart) RootView.findViewById(R.id.chart1);
-
+        barChart = (BarChart) rootView.findViewById(R.id.chart1);
+        startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
+        endTime = (TextView) rootView.findViewById(R.id.tvEndTime);
         getDailyStats();
     }
 
@@ -87,6 +92,9 @@ public class DailyStats extends Fragment {
         lStringBuilder.append("DAILY STATS \n");
         lStringBuilder.append("start date: "+sdf.format(startresultdate)+" \n");
         lStringBuilder.append("end date: "+sdf.format(endresultdate)+" \n");
+
+        startTime.setText("From "+sdf.format(startresultdate));
+        endTime.setText("To "+sdf.format(endresultdate));
 
         Log.d(AppHelper.TAG, lStringBuilder.toString());
 
@@ -135,26 +143,26 @@ public class DailyStats extends Fragment {
 
     private void setChart(float[] values) {
 
-//        mChart.setOnChartValueSelectedListener( this);
+//        barChart.setOnChartValueSelectedListener( this);
 
-        mChart.setDrawBarShadow(false);
-        mChart.setDrawValueAboveBar(true);
+        barChart.setDrawBarShadow(false);
+        barChart.setDrawValueAboveBar(true);
 
-        mChart.getDescription().setEnabled(false);
+        barChart.getDescription().setEnabled(false);
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        mChart.setMaxVisibleValueCount(60);
+        barChart.setMaxVisibleValueCount(60);
 
         // scaling can now only be done on x- and y-axis separately
-        mChart.setPinchZoom(false);
+        barChart.setPinchZoom(false);
 
-        mChart.setDrawGridBackground(false);
-        // mChart.setDrawYLabels(false);
+        barChart.setDrawGridBackground(false);
+        // barChart.setDrawYLabels(false);
 
-        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(mChart);
+        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart);
 
-        XAxis xAxis = mChart.getXAxis();
+        XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 //        xAxis.setTypeface(mTfLight);
         xAxis.setDrawGridLines(false);
@@ -164,7 +172,7 @@ public class DailyStats extends Fragment {
 
 //        IAxisValueFormatter custom = new MyAxisValueFormatter();
 
-        YAxis leftAxis = mChart.getAxisLeft();
+        YAxis leftAxis = barChart.getAxisLeft();
 //        leftAxis.setTypeface(mTfLight);
         leftAxis.setLabelCount(8, false);
 //        leftAxis.setValueFormatter(custom);
@@ -173,7 +181,7 @@ public class DailyStats extends Fragment {
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
         leftAxis.setAxisMaximum(24f);
 
-        YAxis rightAxis = mChart.getAxisRight();
+        YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setDrawGridLines(false);
 //        rightAxis.setTypeface(mTfLight);
         rightAxis.setLabelCount(8, false);
@@ -182,7 +190,7 @@ public class DailyStats extends Fragment {
         rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
         rightAxis.setAxisMaximum(24f);
 
-        Legend l = mChart.getLegend();
+        Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
@@ -214,12 +222,12 @@ public class DailyStats extends Fragment {
 
         BarDataSet set1;
 
-        if (mChart.getData() != null &&
-                mChart.getData().getDataSetCount() > 0) {
-            set1 = (BarDataSet) mChart.getData().getDataSetByIndex(0);
+        if (barChart.getData() != null &&
+                barChart.getData().getDataSetCount() > 0) {
+            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
             set1.setValues(yVals1);
-            mChart.getData().notifyDataChanged();
-            mChart.notifyDataSetChanged();
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
         } else {
             set1 = new BarDataSet(yVals1, "App usage in Hours");
 
@@ -235,7 +243,7 @@ public class DailyStats extends Fragment {
 //            data.setValueTypeface(mTfLight);
             data.setBarWidth(0.9f);
 
-            mChart.setData(data);
+            barChart.setData(data);
         }
     }
 

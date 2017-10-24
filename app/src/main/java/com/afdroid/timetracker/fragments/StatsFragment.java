@@ -1,15 +1,14 @@
 package com.afdroid.timetracker.fragments;
 
-/**
- * Created by afrin on 12/7/17.
- */
 import android.app.usage.UsageStats;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
@@ -31,40 +30,68 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-public class WeeklyStats extends Fragment {
+public class StatsFragment extends Fragment {
+    private BarChart barChart;
 
-    protected BarChart mChart;
+    private TextView startTime;
+    private TextView endTime;
 
-    View RootView;
+    private View rootView;
 
-    public int FB = AppHelper.FB;
-    public int WA = AppHelper.WA;
-    public int FB_MSG = AppHelper.FB_MSG;
-    public int INST = AppHelper.INST;
+    private final int FB = AppHelper.FB;
+    private final int WA = AppHelper.WA;
+    private final int FB_MSG = AppHelper.FB_MSG;
+    private final int INST = AppHelper.INST;
+
+    private final int DAILY = AppHelper.DAILY_STATS;
+    private final int WEEKLY = AppHelper.WEEKLY_STATS;
+    private final int MONTHLY = AppHelper.MONTHLY_STATS;
+
+    private int selectedPeriod = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RootView = inflater.inflate(R.layout.fragment_weekly, container, false);
-        return RootView;
+
+        rootView = inflater.inflate(R.layout.fragment_stats, container, false);
+        Bundle args = getArguments();
+        selectedPeriod = args.getInt("period", 0);
+        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mChart = (BarChart) RootView.findViewById(R.id.chart1);
-        getWeeklyStats();
+
+        barChart = (BarChart) rootView.findViewById(R.id.chart1);
+        startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
+        endTime = (TextView) rootView.findViewById(R.id.tvEndTime);
+
+        getStatsInfo();
     }
 
-    private void getWeeklyStats() {
+    private void getStatsInfo() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        //start of week
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+        long millis = 0;
 
-        long millis = calendar.getTimeInMillis();
+        switch (selectedPeriod) {
+            case DAILY:
+                millis = calendar.getTimeInMillis();
+                break;
+            case WEEKLY:
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+                millis = calendar.getTimeInMillis();
+                break;
+            case MONTHLY:
+                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                millis = calendar.getTimeInMillis();
+                break;
+            default:
+                break;
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date startresultdate = new Date(millis);
@@ -75,12 +102,8 @@ public class WeeklyStats extends Fragment {
 
         float[] values = new float[4];
 
-        StringBuilder lStringBuilder = new StringBuilder();
-        lStringBuilder.append("WEEKLY STATS \n");
-        lStringBuilder.append("start date: "+sdf.format(startresultdate)+" \n");
-        lStringBuilder.append("end date: "+sdf.format(endresultdate)+" \n");
-
-        Log.d(AppHelper.TAG, lStringBuilder.toString());
+        startTime.setText("From "+sdf.format(startresultdate));
+        endTime.setText("To "+sdf.format(endresultdate));
 
         if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
             values[FB] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
@@ -111,51 +134,63 @@ public class WeeklyStats extends Fragment {
         }
 
         setChart(values);
-
     }
 
     private void setChart(float[] values) {
 
-        mChart.setDrawBarShadow(false);
-        mChart.setDrawValueAboveBar(true);
-
-        mChart.getDescription().setEnabled(false);
+        barChart.setDrawBarShadow(false);
+        barChart.setDrawValueAboveBar(true);
+        barChart.getDescription().setEnabled(false);
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        mChart.setMaxVisibleValueCount(60);
+        barChart.setMaxVisibleValueCount(60);
 
         // scaling can now only be done on x- and y-axis separately
-        mChart.setPinchZoom(false);
+        barChart.setPinchZoom(false);
 
-        mChart.setDrawGridBackground(false);
-        // mChart.setDrawYLabels(false);
+        barChart.setDrawGridBackground(false);
+        // barChart.setDrawYLabels(false);
 
-        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(mChart);
+        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart);
 
-        XAxis xAxis = mChart.getXAxis();
+        XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(4);
         xAxis.setValueFormatter(xAxisFormatter);
 
-
-        YAxis leftAxis = mChart.getAxisLeft();
+        YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setLabelCount(8, false);
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(15f);
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-        leftAxis.setAxisMaximum(168f);
 
-        YAxis rightAxis = mChart.getAxisRight();
+        YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setDrawGridLines(false);
         rightAxis.setLabelCount(8, false);
         rightAxis.setSpaceTop(15f);
         rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-        rightAxis.setAxisMaximum(168f);
 
-        Legend l = mChart.getLegend();
+        switch (selectedPeriod) {
+            case DAILY:
+                leftAxis.setAxisMaximum(24f);
+                rightAxis.setAxisMaximum(24f);
+                break;
+            case WEEKLY:
+                leftAxis.setAxisMaximum(168f);
+                rightAxis.setAxisMaximum(168f);
+                break;
+            case MONTHLY:
+                leftAxis.setAxisMaximum(744f);
+                rightAxis.setAxisMaximum(744f);
+                break;
+            default:
+                break;
+        }
+
+        Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
@@ -165,46 +200,44 @@ public class WeeklyStats extends Fragment {
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
 
-        setData(4, values);
+        setData(4, 24, values);
     }
 
-    private void setData(int count, float[] values) {
+    private void setData(int count, float range, float[] values) {
 
         int start = 0;
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
         for (int i = start; i <  count; i++) {
+            float mult = (range + 1);
             float val =  values[i];
             yVals1.add(new BarEntry(i, val));
         }
 
         BarDataSet set1;
 
-        if (mChart.getData() != null &&
-                mChart.getData().getDataSetCount() > 0) {
-            set1 = (BarDataSet) mChart.getData().getDataSetByIndex(0);
+        if (barChart.getData() != null &&
+                barChart.getData().getDataSetCount() > 0) {
+            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
             set1.setValues(yVals1);
-            mChart.getData().notifyDataChanged();
-            mChart.notifyDataSetChanged();
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
         } else {
             set1 = new BarDataSet(yVals1, "App usage in Hours");
-
             set1.setDrawIcons(false);
-
             set1.setColors(ColorTemplate.MATERIAL_COLORS);
-
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
             dataSets.add(set1);
-
             BarData data = new BarData(dataSets);
             data.setValueTextSize(10f);
             data.setBarWidth(0.9f);
-
-            mChart.setData(data);
+            barChart.setData(data);
         }
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
 }
-
-

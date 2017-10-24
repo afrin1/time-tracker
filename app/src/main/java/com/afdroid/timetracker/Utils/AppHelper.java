@@ -9,17 +9,20 @@ import android.content.Context;
 
 public class AppHelper {
 
-    public static String TAG = "TIME_TRACKER";
-    public static String FB_PKG_NAME = "com.facebook.katana";
-    public static String FB_MSG_PKG_NAME = "com.facebook.orca";
-    public static String WHATSAPP_PKG_NAME = "com.whatsapp";
-    public static String INSTAGRAM_PKG_NAME = "com.instagram";
+    public static final String TAG = "TIME_TRACKER";
+    public static final String FB_PKG_NAME = "com.facebook.katana";
+    public static final String FB_MSG_PKG_NAME = "com.facebook.orca";
+    public static final String WHATSAPP_PKG_NAME = "com.whatsapp";
+    public static final String INSTAGRAM_PKG_NAME = "com.instagram";
 
-    public static int FB = 0;
-    public static int WA = 1;
-    public static int FB_MSG = 2;
-    public static int INST = 3;
+    public final static int FB = 0;
+    public final static int WA = 1;
+    public final static int FB_MSG = 2;
+    public final static int INST = 3;
 
+    public final static int DAILY_STATS = 0;
+    public final static int WEEKLY_STATS = 1;
+    public final static int MONTHLY_STATS = 2;
 
     private static UsageStatsManager mUsageStatsManager;
 
