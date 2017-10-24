@@ -51,4 +51,10 @@ public class AppHelper {
 //        String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
         return hours;
     }
+
+    public static long getMinutes(long millis) {
+        long seconds = millis / 1000;
+        long minutes = seconds / 60;
+        return minutes;
+    }
 }

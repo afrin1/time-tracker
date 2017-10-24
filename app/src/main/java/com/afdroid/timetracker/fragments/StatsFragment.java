@@ -106,8 +106,15 @@ public class StatsFragment extends Fragment {
         endTime.setText("To "+sdf.format(endresultdate));
 
         if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
-            values[FB] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
-                    getTotalTimeInForeground()) ;
+
+            if (selectedPeriod == DAILY) {
+                values[FB] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
+            else {
+                values[FB] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
             long mills = lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
                     getTotalTimeInForeground();
 
@@ -125,14 +132,26 @@ public class StatsFragment extends Fragment {
         }
 
         if (lUsageStatsMap.containsKey(AppHelper.FB_MSG_PKG_NAME)) {
-            values[FB_MSG] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
-                    getTotalTimeInForeground()) ;
+            if (selectedPeriod == DAILY) {
+                values[FB_MSG] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
+            else {
+                values[FB_MSG] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
             Log.d(AppHelper.TAG, "FB_MSG_PKG_NAME hours = "+values[FB_MSG]);
         }
 
         if (lUsageStatsMap.containsKey(AppHelper.WHATSAPP_PKG_NAME)) {
-            values[WA] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
-                    getTotalTimeInForeground()) ;
+            if (selectedPeriod == DAILY) {
+                values[WA] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
+            else {
+                values[WA] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
+                        getTotalTimeInForeground());
+            }
             Log.d(AppHelper.TAG, "WHATSAPP_PKG_NAME hours = "+values[WA]);
         }
 
@@ -232,7 +251,12 @@ public class StatsFragment extends Fragment {
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
         } else {
-            set1 = new BarDataSet(yVals1, "App usage in Hours");
+            if (selectedPeriod == DAILY) {
+                set1 = new BarDataSet(yVals1, "App usage in Minutes");
+            }
+            else {
+                set1 = new BarDataSet(yVals1, "App usage in Hours");
+            }
             set1.setDrawIcons(false);
             set1.setColors(ColorTemplate.MATERIAL_COLORS);
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
