@@ -108,10 +108,19 @@ public class StatsFragment extends Fragment {
         if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
             values[FB] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
                     getTotalTimeInForeground()) ;
-//            long seconds = fb / 1000;
-//            long hours = seconds / 3600;
-//            fb = hours;
+            long mills = lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
+                    getTotalTimeInForeground();
 
+            float seconds = mills / 1000;
+            float minutes = seconds / 60;
+            float hours = minutes / 60;
+            String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
+            Log.d(AppHelper.TAG, "********* \nTime FM = "+time);
+
+            float convsec = (seconds % 60/60);
+            float convmin = minutes % 60/60;
+            float hrs = hours % 24 + convmin;
+            Log.d(AppHelper.TAG, "FB hours coverted = "+hrs + " conv mins = "+convmin+ " conv sec = "+convsec);
             Log.d(AppHelper.TAG, "FB hours = "+values[FB]);
         }
 
@@ -162,18 +171,18 @@ public class StatsFragment extends Fragment {
         xAxis.setValueFormatter(xAxisFormatter);
 
         YAxis leftAxis = barChart.getAxisLeft();
-        leftAxis.setLabelCount(8, false);
+        leftAxis.setLabelCount(10, false);
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(15f);
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setDrawGridLines(false);
-        rightAxis.setLabelCount(8, false);
+        rightAxis.setLabelCount(10, false);
         rightAxis.setSpaceTop(15f);
-        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        rightAxis.setAxisMinimum(0f);// this replaces setStartAtZero(true)
 
-        switch (selectedPeriod) {
+        /*switch (selectedPeriod) {
             case DAILY:
                 leftAxis.setAxisMaximum(24f);
                 rightAxis.setAxisMaximum(24f);
@@ -188,7 +197,7 @@ public class StatsFragment extends Fragment {
                 break;
             default:
                 break;
-        }
+        }*/
 
         Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -200,17 +209,16 @@ public class StatsFragment extends Fragment {
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
 
-        setData(4, 24, values);
+        setData(4, values);
     }
 
-    private void setData(int count, float range, float[] values) {
+    private void setData(int count, float[] values) {
 
         int start = 0;
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
         for (int i = start; i <  count; i++) {
-            float mult = (range + 1);
             float val =  values[i];
             yVals1.add(new BarEntry(i, val));
         }

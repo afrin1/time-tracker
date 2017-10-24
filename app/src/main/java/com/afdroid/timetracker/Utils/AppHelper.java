@@ -13,7 +13,7 @@ public class AppHelper {
     public static final String FB_PKG_NAME = "com.facebook.katana";
     public static final String FB_MSG_PKG_NAME = "com.facebook.orca";
     public static final String WHATSAPP_PKG_NAME = "com.whatsapp";
-    public static final String INSTAGRAM_PKG_NAME = "com.instagram";
+    public static final String INSTAGRAM_PKG_NAME = "com.instagram.android";
 
     public final static int FB = 0;
     public final static int WA = 1;
