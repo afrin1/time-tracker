@@ -30,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+import static android.content.ContentValues.TAG;
+
 public class StatsFragment extends Fragment {
     private BarChart barChart;
 
@@ -122,13 +124,13 @@ public class StatsFragment extends Fragment {
             float minutes = seconds / 60;
             float hours = minutes / 60;
             String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
-            Log.d(AppHelper.TAG, "********* \nTime FM = "+time);
+            Log.d(TAG, "********* \nTime FM = "+time);
 
             float convsec = (seconds % 60/60);
             float convmin = minutes % 60/60;
             float hrs = hours % 24 + convmin;
-            Log.d(AppHelper.TAG, "FB hours coverted = "+hrs + " conv mins = "+convmin+ " conv sec = "+convsec);
-            Log.d(AppHelper.TAG, "FB hours = "+values[FB]);
+            Log.d(TAG, "FB hours coverted = "+hrs + " conv mins = "+convmin+ " conv sec = "+convsec);
+            Log.d(TAG, "FB hours = "+values[FB]);
         }
 
         if (lUsageStatsMap.containsKey(AppHelper.FB_MSG_PKG_NAME)) {
@@ -140,7 +142,7 @@ public class StatsFragment extends Fragment {
                 values[FB_MSG] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
                         getTotalTimeInForeground());
             }
-            Log.d(AppHelper.TAG, "FB_MSG_PKG_NAME hours = "+values[FB_MSG]);
+            Log.d(TAG, "FB_MSG_PKG_NAME hours = "+values[FB_MSG]);
         }
 
         if (lUsageStatsMap.containsKey(AppHelper.WHATSAPP_PKG_NAME)) {
@@ -152,13 +154,15 @@ public class StatsFragment extends Fragment {
                 values[WA] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
                         getTotalTimeInForeground());
             }
-            Log.d(AppHelper.TAG, "WHATSAPP_PKG_NAME hours = "+values[WA]);
+            Log.d(TAG, "WHATSAPP_PKG_NAME hours = "+values[WA]);
+            Log.d(TAG, "whatsapp pkg millis - "+lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
+                    getTotalTimeInForeground());
         }
 
         if (lUsageStatsMap.containsKey(AppHelper.INSTAGRAM_PKG_NAME)) {
             values[INST] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.INSTAGRAM_PKG_NAME).
                     getTotalTimeInForeground()) ;
-            Log.d(AppHelper.TAG, "INSTAGRAM hours = "+values[INST]);
+            Log.d(TAG, "INSTAGRAM hours = "+values[INST]);
         }
 
         setChart(values);
@@ -239,6 +243,7 @@ public class StatsFragment extends Fragment {
 
         for (int i = start; i <  count; i++) {
             float val =  values[i];
+            Log.d(TAG, "bar chart value = "+val);
             yVals1.add(new BarEntry(i, val));
         }
 

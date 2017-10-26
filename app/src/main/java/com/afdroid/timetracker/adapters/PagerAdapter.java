@@ -1,4 +1,4 @@
-package com.afdroid.timetracker;
+package com.afdroid.timetracker.adapters;
 
 /**
  * Created by afrin on 12/7/17.

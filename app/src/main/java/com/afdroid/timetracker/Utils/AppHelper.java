@@ -16,8 +16,8 @@ public class AppHelper {
     public static final String INSTAGRAM_PKG_NAME = "com.instagram.android";
 
     public final static int FB = 0;
-    public final static int WA = 1;
-    public final static int FB_MSG = 2;
+    public final static int WA = 2;
+    public final static int FB_MSG = 1;
     public final static int INST = 3;
 
     public final static int DAILY_STATS = 0;

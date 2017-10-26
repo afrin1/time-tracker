@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:padding="10dp"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/iv_app_icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/ic_launcher"
+        android:adjustViewBounds="true">
+    </ImageView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/iv_app_icon"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_toStartOf="@+id/app_switch">
+
+        <TextView
+            android:id="@+id/txt_app_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <!--<TextView
+            android:id="@+id/txt_time_used"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="3dp"/>-->
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/app_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

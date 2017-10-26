@@ -1,7 +1,6 @@
-package com.afdroid.timetracker;
+package com.afdroid.timetracker.screens;
 
 import android.app.AppOpsManager;
-import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,16 +10,23 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.afdroid.timetracker.R;
+import com.afdroid.timetracker.adapters.PagerAdapter;
 
 import static com.afdroid.timetracker.Utils.AppHelper.initAppHelper;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
-    UsageStatsManager mUsageStatsManager;
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,20 +35,31 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setLogo(R.mipmap.ic_launcher2);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+
+        createLayout();
+    }
+
+    private void createLayout() {
+        setViewPager();
+        initAppHelper(getApplicationContext());
+        fillStats();
+    }
+
+    private void setViewPager() {
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.daily_stats)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.weekly_stats)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.monthly_stats)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
         tabLayout.setVisibility(View.INVISIBLE);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter
-                (getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -59,10 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        initAppHelper(getApplicationContext());
-
-        fillStats();
     }
 
     private void fillStats() {
@@ -99,4 +112,24 @@ public class MainActivity extends AppCompatActivity {
 //                Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                //launch settings screen
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.action_bar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 }
