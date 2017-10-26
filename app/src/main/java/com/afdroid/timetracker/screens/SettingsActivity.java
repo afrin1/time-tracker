@@ -1,5 +1,6 @@
 package com.afdroid.timetracker.screens;
 
+import android.app.ProgressDialog;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -7,9 +8,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.afdroid.timetracker.R;
-import com.afdroid.timetracker.Utils.AppInfo;
+import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.Utils.ListItemDecoration;
 import com.afdroid.timetracker.adapters.AppListAdapter;
 
@@ -18,36 +21,26 @@ import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private List<AppInfo> appList = new ArrayList<>();
+    private List<ApplicationInfo> appList = new ArrayList<>();
     private AppListAdapter appUsageAdapter;
     private RecyclerView appRecyclerList;
-    private GetAppsDataTask getAppsDataTask;
+//    private GetAppsDataTask getAppsDataTask;
+    private PackageManager packageManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Settings");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         appRecyclerList = (RecyclerView) findViewById(R.id.app_list);
-
-        /*Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> pkgAppsList = getApplicationContext().getPackageManager().
-                queryIntentActivities( mainIntent, 0);
-        for (int i=0; i<pkgAppsList.size();i++) {
-            Log.d(AppHelper.TAG, "pkg name = "+pkgAppsList.get(i).resolvePackageName);
-        }*/
-
-        /*// Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();*/
-
         setAppList();
-        getAppsDataTask = new GetAppsDataTask();
-        if (getAppsDataTask != null) {
-            getAppsDataTask.execute();
-        }
+        packageManager = getPackageManager();
+        new LoadApplications().execute();
 
     }
 
@@ -58,40 +51,61 @@ public class SettingsActivity extends AppCompatActivity {
             appRecyclerList.setLayoutManager(new LinearLayoutManager(this));
             appRecyclerList.addItemDecoration(new ListItemDecoration(
                     Math.round(getResources().getDisplayMetrics().density * 5)));
-//            appUsageAdapter.setOnSettingsChangedListener(this);
         }
     }
 
-    class GetAppsDataTask extends AsyncTask<Void, Void, List<AppInfo>> {
+    private void checkForLaunchIntent(List<ApplicationInfo> list) {
+        for (ApplicationInfo info : list) {
+            try {
+                if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
+                    Log.d(AppHelper.TAG, "info = "+info.packageName);
+                    appList.add(info);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class LoadApplications extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog progress = null;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            checkForLaunchIntent(
+                    packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
+            return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            appUsageAdapter.notifyDataSetChanged();
+            progress.dismiss();
+            super.onPostExecute(result);
+        }
 
         @Override
         protected void onPreExecute() {
+            progress = ProgressDialog.show(SettingsActivity.this, null,
+                    "Loading application info...");
             super.onPreExecute();
-//            adapter.setLoading(true);
         }
 
         @Override
-        protected List<AppInfo> doInBackground(Void... params) {
-            PackageManager pm = getPackageManager();
-            List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-            for (ApplicationInfo app: apps) {
-//                Log.d(AppHelper.TAG, "pkg name = "+app.packageName);
-                try {
-                    appList.add(new AppInfo(app.name,
-                            pm.getApplicationIcon(app.packageName), false));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            return (appList);
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
         }
+    }
 
-
-        @Override
-        protected void onPostExecute(List<AppInfo> appInfos) {
-            super.onPostExecute(appInfos);
-            appUsageAdapter.notifyDataSetChanged();
-        }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }

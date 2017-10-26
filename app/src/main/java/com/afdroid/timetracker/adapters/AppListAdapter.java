@@ -1,6 +1,8 @@
 package com.afdroid.timetracker.adapters;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +15,6 @@ import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
-import com.afdroid.timetracker.Utils.AppInfo;
 
 import java.util.List;
 
@@ -22,46 +23,38 @@ import java.util.List;
  */
 
 public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<AppInfo> data;
+    private List<ApplicationInfo> data;
 //    private Set<String> blockedApps;
     private Context context;
-    private OnSettingsChangedListener onSettingsChangedListener;
+    private PackageManager packageManager;
 
     private class AppsViewHolder extends RecyclerView.ViewHolder implements
             CompoundButton.OnCheckedChangeListener {
 
-        private TextView txtAppName /*, txtTimeUSed*/;
+        private TextView txtAppName;
         private ImageView ivAppIcon;
         private Switch appSwitch;
 
         private AppsViewHolder(View view) {
             super (view);
-
             txtAppName = (TextView) view.findViewById(R.id.txt_app_label);
-//            txtTimeUSed = (TextView) view.findViewById(R.id.txt_time_used);
             ivAppIcon = (ImageView) view.findViewById(R.id.iv_app_icon);
             appSwitch = (Switch) view.findViewById(R.id.app_switch);
-
             appSwitch.setOnCheckedChangeListener(this);
         }
 
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             Log.d(AppHelper.TAG, " Switch changed - "+b);
-//            onSettingsChangedListener.onAppSwitchChanged(getAdapterPosition(),
-//                    appSwitch.isChecked());
         }
 
     }
 
-    public AppListAdapter(Context context, List<AppInfo> data) {
+    public AppListAdapter(Context context, List<ApplicationInfo> data) {
         super();
         this.context = context;
         this.data = data;
-    }
-
-    public void setOnSettingsChangedListener(OnSettingsChangedListener onSettingsChangedListener) {
-        this.onSettingsChangedListener = onSettingsChangedListener;
+        packageManager = context.getPackageManager();
     }
 
     @Override
@@ -73,16 +66,13 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-
         if (data.size() > 0) {
-            AppInfo appInfo = data.get(position);
+            ApplicationInfo appInfo = data.get(position);
             AppsViewHolder holder = (AppsViewHolder) viewHolder;
-
-            holder.txtAppName.setText(appInfo.getAppName());
-            holder.ivAppIcon.setImageDrawable(appInfo.getAppIcon());
-            holder.appSwitch.setChecked(appInfo.isSelectedForStats());
+            holder.txtAppName.setText(appInfo.loadLabel(packageManager));
+            holder.ivAppIcon.setImageDrawable(appInfo.loadIcon(packageManager));
+            holder.appSwitch.setChecked(false);
         }
-
     }
 
     @Override
@@ -90,10 +80,4 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return data.size();
     }
 
-    public interface OnSettingsChangedListener {
-        void onEnabled();
-        void onDisabled();
-        void onAppSwitchChanged(int position,
-                                boolean isBlocked);
-    }
 }

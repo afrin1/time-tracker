@@ -108,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
-//        return ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -122,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
