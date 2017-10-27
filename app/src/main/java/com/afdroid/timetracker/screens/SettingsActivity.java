@@ -9,23 +9,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 
 import com.afdroid.timetracker.R;
-import com.afdroid.timetracker.Utils.AppHelper;
+import com.afdroid.timetracker.Utils.AppInfo;
 import com.afdroid.timetracker.Utils.ListItemDecoration;
 import com.afdroid.timetracker.adapters.AppListAdapter;
+import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements
+        AppListAdapter.OnSettingsChangedListener{
 
-    private List<ApplicationInfo> appList = new ArrayList<>();
-    private AppListAdapter appUsageAdapter;
+    private List<AppInfo> appList = new ArrayList<AppInfo>();
+    private AppListAdapter appListAdapter;
     private RecyclerView appRecyclerList;
-//    private GetAppsDataTask getAppsDataTask;
     private PackageManager packageManager = null;
+    private List<String> prefList = new ArrayList<String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +46,19 @@ public class SettingsActivity extends AppCompatActivity {
         setAppList();
         packageManager = getPackageManager();
         new LoadApplications().execute();
-
     }
 
     private void setAppList() {
-        appUsageAdapter = new AppListAdapter(this, appList);
-        if (appUsageAdapter != null) {
-            appRecyclerList.setAdapter(appUsageAdapter);
+        String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(getApplicationContext());
+        prefList = new LinkedList<String>(Arrays.asList(TextUtils.split(serialized, ",")));
+
+        appListAdapter = new AppListAdapter(this, appList);
+        if (appListAdapter != null) {
+            appRecyclerList.setAdapter(appListAdapter);
             appRecyclerList.setLayoutManager(new LinearLayoutManager(this));
             appRecyclerList.addItemDecoration(new ListItemDecoration(
                     Math.round(getResources().getDisplayMetrics().density * 5)));
+            appListAdapter.setOnSettingsChangedListener(this);
         }
     }
 
@@ -58,11 +66,33 @@ public class SettingsActivity extends AppCompatActivity {
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
-                    Log.d(AppHelper.TAG, "info = "+info.packageName);
-                    appList.add(info);
+//                    Log.d(AppHelper.TAG, "info = "+info.packageName);
+                    boolean isChecked = false;
+                    if (prefList.contains(info.packageName)) {
+                        isChecked = true;
+                    }
+                    appList.add(new AppInfo((String) info.loadLabel(packageManager),
+                            info.packageName,
+                            info.loadIcon(packageManager),
+                            isChecked));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onListChanged(int position, boolean isChecked) {
+        String pkgName = appList.get(position).getAppPkgName();
+        if (isChecked) {
+            if (!prefList.contains(pkgName)) {
+                prefList.add(pkgName);
+            }
+        }
+        else {
+            if (prefList.contains(pkgName)) {
+                prefList.remove(pkgName);
             }
         }
     }
@@ -84,7 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            appUsageAdapter.notifyDataSetChanged();
+            appListAdapter.notifyDataSetChanged();
             progress.dismiss();
             super.onPostExecute(result);
         }
@@ -108,4 +138,17 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        TimeTrackerPrefHandler.INSTANCE.savePkgList
+                (TextUtils.join(",", prefList), this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        TimeTrackerPrefHandler.INSTANCE.savePkgList
+                (TextUtils.join(",", prefList), this);
+    }
 }

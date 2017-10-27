@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,12 @@ import android.widget.Toast;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.adapters.PagerAdapter;
+import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.afdroid.timetracker.Utils.AppHelper.initAppHelper;
 
@@ -27,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
+    private List<String> prefList = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +48,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
+        setAppList();
         createLayout();
+    }
+
+    private void setAppList() {
+        String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(getApplicationContext());
+        prefList = new LinkedList<String>(Arrays.asList(TextUtils.split(serialized, ",")));
     }
 
     private void createLayout() {

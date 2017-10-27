@@ -1,8 +1,6 @@
 package com.afdroid.timetracker.adapters;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +13,8 @@ import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
+import com.afdroid.timetracker.Utils.AppInfo;
+import com.afdroid.timetracker.screens.SettingsActivity;
 
 import java.util.List;
 
@@ -23,10 +23,9 @@ import java.util.List;
  */
 
 public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ApplicationInfo> data;
-//    private Set<String> blockedApps;
+    private List<AppInfo> data;
     private Context context;
-    private PackageManager packageManager;
+    private OnSettingsChangedListener onSettingsChangedListener;
 
     private class AppsViewHolder extends RecyclerView.ViewHolder implements
             CompoundButton.OnCheckedChangeListener {
@@ -46,20 +45,24 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             Log.d(AppHelper.TAG, " Switch changed - "+b);
+            onSettingsChangedListener.onListChanged(getAdapterPosition(),
+                    appSwitch.isChecked());
         }
 
     }
+    public void setOnSettingsChangedListener(SettingsActivity onSettingsChangedListener) {
+        this.onSettingsChangedListener = onSettingsChangedListener;
+    }
 
-    public AppListAdapter(Context context, List<ApplicationInfo> data) {
+    public AppListAdapter(Context context, List<AppInfo> data) {
         super();
         this.context = context;
         this.data = data;
-        packageManager = context.getPackageManager();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-     View view = LayoutInflater.from(context)
+        View view = LayoutInflater.from(context)
                 .inflate(R.layout.app_list_row, parent, false);
         return new AppsViewHolder(view);
     }
@@ -67,17 +70,22 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (data.size() > 0) {
-            ApplicationInfo appInfo = data.get(position);
+            AppInfo appInfo = data.get(position);
             AppsViewHolder holder = (AppsViewHolder) viewHolder;
-            holder.txtAppName.setText(appInfo.loadLabel(packageManager));
-            holder.ivAppIcon.setImageDrawable(appInfo.loadIcon(packageManager));
-            holder.appSwitch.setChecked(false);
+            holder.txtAppName.setText(appInfo.getAppName());
+            holder.ivAppIcon.setImageDrawable(appInfo.getAppIcon());
+            holder.appSwitch.setChecked(appInfo.isSelectedForStats());
         }
     }
 
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public interface OnSettingsChangedListener {
+        void onListChanged(int position,
+                                boolean isBlocked);
     }
 
 }
