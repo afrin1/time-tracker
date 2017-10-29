@@ -2,6 +2,7 @@ package com.afdroid.timetracker.Utils;
 
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by afrin on 23/10/17.
@@ -44,17 +45,17 @@ public class AppHelper {
         return time;
     }
 
-    public static long getHours(long millis) {
-        long seconds = millis / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-//        String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
+    public static float getHours(long millis) {
+        float seconds = millis / 1000;
+        float minutes = seconds / 60;
+        float hours = (minutes/60);
+        Log.d(AppHelper.TAG, "getHours :: "+hours);
         return hours;
     }
 
-    public static long getMinutes(long millis) {
-        long seconds = millis / 1000;
-        long minutes = seconds / 60;
+    public static float getMinutes(long millis) {
+        float seconds = millis / 1000;
+        float minutes = seconds / 60;
         return minutes;
     }
 }

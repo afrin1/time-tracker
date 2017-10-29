@@ -30,24 +30,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putInt("period", position);
-//        args.putStringArrayList("applist", (ArrayList<String>)appList);
         statsFragment.setArguments(args);
-
         return statsFragment;
-
-        /*switch (position) {
-            case 0:
-                DailyStats tab1 = new DailyStats();
-                return tab1;
-            case 1:
-                WeeklyStats tab2 = new WeeklyStats();
-                return tab2;
-            case 2:
-                MonthlyStats tab3 = new MonthlyStats();
-                return tab3;
-            default:
-                return null;
-        }*/
     }
 
     @Override

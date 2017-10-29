@@ -60,7 +60,6 @@ public class StatsFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         Bundle args = getArguments();
         selectedPeriod = args.getInt("period", 0);
-//        appList = args.getStringArrayList("applist");
         Log.d(AppHelper.TAG, "StatsFragment :: oncreateviewholder");
         return rootView;
     }
@@ -156,20 +155,7 @@ public class StatsFragment extends Fragment {
             setChart(values);
         }
 
-        /*if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
-
-            if (selectedPeriod == DAILY) {
-                values[FB] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            else {
-                values[FB] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            long mills = lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
-                    getTotalTimeInForeground();
-
-            float seconds = mills / 1000;
+        /*  float seconds = mills / 1000;
             float minutes = seconds / 60;
             float hours = minutes / 60;
             String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
@@ -180,39 +166,7 @@ public class StatsFragment extends Fragment {
             float hrs = hours % 24 + convmin;
             Log.d(TAG, "FB hours coverted = "+hrs + " conv mins = "+convmin+ " conv sec = "+convsec);
             Log.d(TAG, "FB hours = "+values[FB]);
-        }
-
-        if (lUsageStatsMap.containsKey(AppHelper.FB_MSG_PKG_NAME)) {
-            if (selectedPeriod == DAILY) {
-                values[FB_MSG] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            else {
-                values[FB_MSG] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.FB_MSG_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            Log.d(TAG, "FB_MSG_PKG_NAME hours = "+values[FB_MSG]);
-        }
-
-        if (lUsageStatsMap.containsKey(AppHelper.WHATSAPP_PKG_NAME)) {
-            if (selectedPeriod == DAILY) {
-                values[WA] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            else {
-                values[WA] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
-                        getTotalTimeInForeground());
-            }
-            Log.d(TAG, "WHATSAPP_PKG_NAME hours = "+values[WA]);
-            Log.d(TAG, "whatsapp pkg millis - "+lUsageStatsMap.get(AppHelper.WHATSAPP_PKG_NAME).
-                    getTotalTimeInForeground());
-        }
-
-        if (lUsageStatsMap.containsKey(AppHelper.INSTAGRAM_PKG_NAME)) {
-            values[INST] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.INSTAGRAM_PKG_NAME).
-                    getTotalTimeInForeground()) ;
-            Log.d(TAG, "INSTAGRAM hours = "+values[INST]);
-        }*/
+        */
 
     }
 
@@ -255,23 +209,6 @@ public class StatsFragment extends Fragment {
 
         YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
-
-        /*switch (selectedPeriod) {
-            case DAILY:
-                leftAxis.setAxisMaximum(24f);
-                rightAxis.setAxisMaximum(24f);
-                break;
-            case WEEKLY:
-                leftAxis.setAxisMaximum(168f);
-                rightAxis.setAxisMaximum(168f);
-                break;
-            case MONTHLY:
-                leftAxis.setAxisMaximum(744f);
-                rightAxis.setAxisMaximum(744f);
-                break;
-            default:
-                break;
-        }*/
 
         Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
