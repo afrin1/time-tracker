@@ -2,8 +2,10 @@ package com.afdroid.timetracker.fragments;
 
 import android.app.usage.UsageStats;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.chartformatter.DayAxisValueFormatter;
+import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -26,8 +29,11 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -40,16 +46,13 @@ public class StatsFragment extends Fragment {
 
     private View rootView;
 
-    private final int FB = AppHelper.FB;
-    private final int WA = AppHelper.WA;
-    private final int FB_MSG = AppHelper.FB_MSG;
-    private final int INST = AppHelper.INST;
-
     private final int DAILY = AppHelper.DAILY_STATS;
     private final int WEEKLY = AppHelper.WEEKLY_STATS;
     private final int MONTHLY = AppHelper.MONTHLY_STATS;
 
     private int selectedPeriod = 0;
+    private List<String> appList = null;
+    private List<String> appNameList = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,12 +60,22 @@ public class StatsFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         Bundle args = getArguments();
         selectedPeriod = args.getInt("period", 0);
+//        appList = args.getStringArrayList("applist");
+        Log.d(AppHelper.TAG, "StatsFragment :: oncreateviewholder");
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(AppHelper.TAG, "StatsFragment :: onResume");
+        String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList
+                (getActivity().getApplicationContext());
+        if (serialized != null) {
+            appList = new LinkedList<String>(Arrays.asList(TextUtils.
+                    split(serialized, ",")));
+            appNameList = new LinkedList<String>();
+        }
 
         barChart = (BarChart) rootView.findViewById(R.id.chart1);
         startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
@@ -98,16 +111,52 @@ public class StatsFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date startresultdate = new Date(millis);
         Date endresultdate = new Date(System.currentTimeMillis());
-        Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().queryAndAggregateUsageStats(
+        Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
+                queryAndAggregateUsageStats(
                 millis,
                 System.currentTimeMillis());
-
-        float[] values = new float[4];
 
         startTime.setText("From "+sdf.format(startresultdate));
         endTime.setText("To "+sdf.format(endresultdate));
 
-        if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
+        if (appList != null) {
+            if (appNameList != null) {
+                appNameList.clear();
+            }
+            PackageManager packageManager= getActivity().getApplicationContext().getPackageManager();
+            float[] values = new float[appList.size()];
+
+            for (int i = 0; i < appList.size(); i++) {
+                String appPkg = appList.get(i);
+                Log.d(AppHelper.TAG, " StatsFragment :: app - "+appPkg);
+                if (lUsageStatsMap.containsKey(appPkg)) {
+
+                    try {
+                        appNameList.add((String) packageManager.getApplicationLabel(packageManager.
+                                getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (selectedPeriod == DAILY) {
+                        values[i] = AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
+                                getTotalTimeInForeground());
+
+                    } else {
+                        values[i] = AppHelper.getHours(lUsageStatsMap.get(appPkg).
+                                getTotalTimeInForeground());
+                    }
+                } else {
+                    //if device does not contain the app,
+                    // remove from the preference list
+                    Log.d(AppHelper.TAG, " StatsFragment :: remove from list");
+                    appList.remove(appPkg);
+                }
+            }
+            saveAppPreference();
+            setChart(values);
+        }
+
+        /*if (lUsageStatsMap.containsKey(AppHelper.FB_PKG_NAME)) {
 
             if (selectedPeriod == DAILY) {
                 values[FB] = AppHelper.getMinutes(lUsageStatsMap.get(AppHelper.FB_PKG_NAME).
@@ -163,13 +212,18 @@ public class StatsFragment extends Fragment {
             values[INST] = AppHelper.getHours(lUsageStatsMap.get(AppHelper.INSTAGRAM_PKG_NAME).
                     getTotalTimeInForeground()) ;
             Log.d(TAG, "INSTAGRAM hours = "+values[INST]);
-        }
+        }*/
 
-        setChart(values);
+    }
+
+    private void saveAppPreference() {
+        Log.d(AppHelper.TAG, " StatsFragment :: savepref");
+        TimeTrackerPrefHandler.INSTANCE.savePkgList
+                (TextUtils.join(",", appList), getActivity().getApplicationContext());
     }
 
     private void setChart(float[] values) {
-
+        Log.d(AppHelper.TAG, "setChart - "+values.length);
         barChart.setDrawBarShadow(false);
         barChart.setDrawValueAboveBar(true);
         barChart.getDescription().setEnabled(false);
@@ -184,13 +238,13 @@ public class StatsFragment extends Fragment {
         barChart.setDrawGridBackground(false);
         // barChart.setDrawYLabels(false);
 
-        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart);
+        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart, appNameList);
 
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setLabelCount(4);
+        xAxis.setLabelCount(appList.size());
         xAxis.setValueFormatter(xAxisFormatter);
 
         YAxis leftAxis = barChart.getAxisLeft();
@@ -200,10 +254,7 @@ public class StatsFragment extends Fragment {
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis rightAxis = barChart.getAxisRight();
-        rightAxis.setDrawGridLines(false);
-        rightAxis.setLabelCount(10, false);
-        rightAxis.setSpaceTop(15f);
-        rightAxis.setAxisMinimum(0f);// this replaces setStartAtZero(true)
+        rightAxis.setEnabled(false);
 
         /*switch (selectedPeriod) {
             case DAILY:
@@ -230,18 +281,15 @@ public class StatsFragment extends Fragment {
         l.setForm(Legend.LegendForm.SQUARE);
         l.setFormSize(9f);
         l.setTextSize(11f);
-        l.setXEntrySpace(4f);
+//        l.setXEntrySpace(4f);
 
-        setData(4, values);
+        setData(values);
     }
 
-    private void setData(int count, float[] values) {
-
-        int start = 0;
-
+    private void setData(float[] values) {
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        for (int i = start; i <  count; i++) {
+        for (int i = 0; i <  appList.size(); i++) {
             float val =  values[i];
             Log.d(TAG, "bar chart value = "+val);
             yVals1.add(new BarEntry(i, val));
@@ -255,7 +303,8 @@ public class StatsFragment extends Fragment {
             set1.setValues(yVals1);
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
-        } else {
+        }
+        else {
             if (selectedPeriod == DAILY) {
                 set1 = new BarDataSet(yVals1, "App usage in Minutes");
             }
@@ -268,7 +317,7 @@ public class StatsFragment extends Fragment {
             dataSets.add(set1);
             BarData data = new BarData(dataSets);
             data.setValueTextSize(10f);
-            data.setBarWidth(0.9f);
+            data.setBarWidth(0.2f);
             barChart.setData(data);
         }
     }

@@ -16,6 +16,7 @@ import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.Utils.AppInfo;
 import com.afdroid.timetracker.screens.SettingsActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             Log.d(AppHelper.TAG, " Switch changed - "+b);
-            onSettingsChangedListener.onListChanged(getAdapterPosition(),
+            onSettingsChangedListener.onListChanged(data.get(getAdapterPosition()).getAppPkgName(),
                     appSwitch.isChecked());
         }
 
@@ -56,6 +57,7 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public AppListAdapter(Context context, List<AppInfo> data) {
         super();
+        Log.d(AppHelper.TAG, "AppListAdapter - ");
         this.context = context;
         this.data = data;
     }
@@ -84,8 +86,14 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public interface OnSettingsChangedListener {
-        void onListChanged(int position,
+        void onListChanged(String pkgName,
                                 boolean isBlocked);
+    }
+
+    public void setFilter(List<AppInfo> countryModels){
+        data = new ArrayList<>();
+        data.addAll(countryModels);
+        notifyDataSetChanged();
     }
 
 }

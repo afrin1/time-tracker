@@ -11,12 +11,16 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.afdroid.timetracker.fragments.StatsFragment;
 
+import java.util.List;
+
 public class PagerAdapter extends FragmentStatePagerAdapter {
     int mNumOfTabs;
+    List<String> appList;
 
-    public PagerAdapter(FragmentManager fm, int NumOfTabs) {
+    public PagerAdapter(FragmentManager fm, int NumOfTabs, List<String> applist) {
         super(fm);
         this.mNumOfTabs = NumOfTabs;
+        this.appList = applist;
     }
 
     @Override
@@ -26,6 +30,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putInt("period", position);
+//        args.putStringArrayList("applist", (ArrayList<String>)appList);
         statsFragment.setArguments(args);
 
         return statsFragment;

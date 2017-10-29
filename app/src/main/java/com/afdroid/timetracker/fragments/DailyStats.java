@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
-import com.afdroid.timetracker.chartformatter.DayAxisValueFormatter;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -24,7 +23,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
@@ -160,7 +158,7 @@ public class DailyStats extends Fragment {
         barChart.setDrawGridBackground(false);
         // barChart.setDrawYLabels(false);
 
-        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart);
+//        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart);
 
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -168,7 +166,7 @@ public class DailyStats extends Fragment {
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(4);
-        xAxis.setValueFormatter(xAxisFormatter);
+//        xAxis.setValueFormatter(xAxisFormatter);
 
 //        IAxisValueFormatter custom = new MyAxisValueFormatter();
 

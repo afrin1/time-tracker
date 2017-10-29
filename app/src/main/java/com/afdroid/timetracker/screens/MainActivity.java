@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.afdroid.timetracker.R;
+import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.adapters.PagerAdapter;
 import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
 
@@ -48,31 +49,29 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        setAppList();
+//        setAppList();
         createLayout();
     }
 
     private void setAppList() {
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(getApplicationContext());
-        prefList = new LinkedList<String>(Arrays.asList(TextUtils.split(serialized, ",")));
+        if (serialized != null) {
+            prefList = new LinkedList<String>(Arrays.asList(TextUtils.split(serialized, ",")));
+        }
     }
 
     private void createLayout() {
+        setTabLayout();
         setViewPager();
-        initAppHelper(getApplicationContext());
+//        initAppHelper(getApplicationContext());
         fillStats();
     }
 
-    private void setViewPager() {
+    private void setTabLayout() {
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.daily_stats)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.weekly_stats)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.monthly_stats)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        tabLayout.setVisibility(View.INVISIBLE);
-
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -92,12 +91,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setViewPager() {
+        if (pagerAdapter!= null) {
+            pagerAdapter = null;
+        }
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
+                prefList);
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+    }
+
     private void fillStats() {
         if (hasPermission()){
-            tabLayout.setVisibility(View.VISIBLE);
+            initAppHelper(getApplicationContext());
         }else{
             requestPermission();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(AppHelper.TAG, "MainActivity :: onResume");
+        setAppList();
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
+                prefList);
+        viewPager.setAdapter(pagerAdapter);
     }
 
     @Override
@@ -132,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
+            case R.id.action_refresh:
+                setViewPager();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -140,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar_menu, menu);
+        inflater.inflate(R.menu.action_bar_main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 }
