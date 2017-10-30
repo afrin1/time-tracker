@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
@@ -118,6 +119,10 @@ public class StatsFragment extends Fragment {
         startTime.setText("From "+sdf.format(startresultdate));
         endTime.setText("To "+sdf.format(endresultdate));
 
+//        for (String app  : lUsageStatsMap.keySet()) {
+        Log.d(AppHelper.TAG, "app list 1 size - "+lUsageStatsMap.keySet().size());
+//        }
+
         if (appList != null) {
             if (appNameList != null) {
                 appNameList.clear();
@@ -128,14 +133,16 @@ public class StatsFragment extends Fragment {
             for (int i = 0; i < appList.size(); i++) {
                 String appPkg = appList.get(i);
                 Log.d(AppHelper.TAG, " StatsFragment :: app - "+appPkg);
+                String appname = null;
+                try {
+                    appname = (String) packageManager.getApplicationLabel(packageManager.
+                            getApplicationInfo(appPkg, PackageManager.GET_META_DATA));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
                 if (lUsageStatsMap.containsKey(appPkg)) {
 
-                    try {
-                        appNameList.add((String) packageManager.getApplicationLabel(packageManager.
-                                getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    appNameList.add(appname);
                     if (selectedPeriod == DAILY) {
                         values[i] = AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
                                 getTotalTimeInForeground());
@@ -149,6 +156,9 @@ public class StatsFragment extends Fragment {
                     // remove from the preference list
                     Log.d(AppHelper.TAG, " StatsFragment :: remove from list");
                     appList.remove(appPkg);
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Usage info not available for app - "+appname,
+                            Toast.LENGTH_SHORT).show();
                 }
             }
             saveAppPreference();

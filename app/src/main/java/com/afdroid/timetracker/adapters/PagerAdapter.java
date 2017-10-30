@@ -25,7 +25,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
         StatsFragment statsFragment = new StatsFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();

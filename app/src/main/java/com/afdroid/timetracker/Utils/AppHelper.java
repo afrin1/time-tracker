@@ -2,7 +2,6 @@ package com.afdroid.timetracker.Utils;
 
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
-import android.util.Log;
 
 /**
  * Created by afrin on 23/10/17.
@@ -49,7 +48,6 @@ public class AppHelper {
         float seconds = millis / 1000;
         float minutes = seconds / 60;
         float hours = (minutes/60);
-        Log.d(AppHelper.TAG, "getHours :: "+hours);
         return hours;
     }
 

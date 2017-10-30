@@ -1,6 +1,7 @@
 package com.afdroid.timetracker.screens;
 
 import android.app.ProgressDialog;
+import android.app.usage.UsageStats;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -25,10 +26,12 @@ import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class SettingsActivity extends AppCompatActivity implements
         AppListAdapter.OnSettingsChangedListener,
@@ -75,9 +78,22 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
     private void checkForLaunchIntent(List<ApplicationInfo> list) {
+        int count = 0;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long millis = calendar.getTimeInMillis();
+        Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
+                queryAndAggregateUsageStats(
+                        millis,
+                        System.currentTimeMillis());
+        Log.d(AppHelper.TAG, "app list 2 size - "+lUsageStatsMap.keySet().size());
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
+//                if (lUsageStatsMap.containsKey(info.packageName)) {
 //                    Log.d(AppHelper.TAG, "info = "+info.packageName);
                     boolean isChecked = false;
                     if (prefList.contains(info.packageName)) {
@@ -87,11 +103,14 @@ public class SettingsActivity extends AppCompatActivity implements
                             info.packageName,
                             info.loadIcon(packageManager),
                             isChecked));
+                    count++;
+//                    Log.d(AppHelper.TAG, "app list size - "+packageManager.getLaunchIntentForPackage(info.packageName));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        Log.d(AppHelper.TAG, "App list size - "+count);
     }
 
     @Override
@@ -116,6 +135,8 @@ public class SettingsActivity extends AppCompatActivity implements
         protected Void doInBackground(Void... params) {
             checkForLaunchIntent(
                     packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
+            Log.d(AppHelper.TAG, "installed app list size = "+
+                    packageManager.getInstalledApplications(PackageManager.GET_META_DATA).size());
             Collections.sort(appList, new Comparator<AppInfo>() {
                 @Override
                 public int compare(AppInfo lhs, AppInfo rhs) {
