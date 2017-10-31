@@ -120,10 +120,6 @@ public class StatsFragment extends Fragment {
         startTime.setText("From "+sdf.format(startresultdate));
         endTime.setText("To "+sdf.format(endresultdate));
 
-//        for (String app  : lUsageStatsMap.keySet()) {
-        Log.d(AppHelper.TAG, "app list 1 size - "+lUsageStatsMap.keySet().size());
-//        }
-
         if (appList != null) {
 //            if (appNameList != null) {
 //                appNameList.clear();
@@ -133,13 +129,11 @@ public class StatsFragment extends Fragment {
 
             for (int i = 0; i < appList.size(); i++) {
                 String appPkg = appList.get(i);
-                Log.d(AppHelper.TAG, " StatsFragment :: app - "+appPkg);
                 String appname = null;
                 try {
                     appNameList.add((String) packageManager.getApplicationLabel(packageManager.
                             getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
                 } catch (PackageManager.NameNotFoundException e) {
-                    Log.d(AppHelper.TAG, "name not added");
                     e.printStackTrace();
                 }
                 if (lUsageStatsMap.containsKey(appPkg)) {
@@ -153,14 +147,7 @@ public class StatsFragment extends Fragment {
                                 getTotalTimeInForeground());
                     }
                 } else {
-                    //if device does not contain the app,
-                    // remove from the preference list
-                   /* Log.d(AppHelper.TAG, " StatsFragment :: remove from list");
-                    appList.remove(appPkg);
-                    appNameList.remove(appname);
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            "Usage info not available for app - "+appname,
-                            Toast.LENGTH_SHORT).show();*/
+                    //if device does not contain the app usage data
                     values[i] = 0.0f;
                 }
             }
@@ -170,13 +157,11 @@ public class StatsFragment extends Fragment {
     }
 
     private void saveAppPreference() {
-        Log.d(AppHelper.TAG, " StatsFragment :: savepref");
         TimeTrackerPrefHandler.INSTANCE.savePkgList
                 (TextUtils.join(",", appList), getActivity().getApplicationContext());
     }
 
     private void setChart(float[] values) {
-        Log.d(AppHelper.TAG, "setChart - "+values.length);
         barChart.setDrawBarShadow(false);
         barChart.setDrawValueAboveBar(true);
         barChart.getDescription().setEnabled(false);
@@ -192,9 +177,6 @@ public class StatsFragment extends Fragment {
 
         barChart.setDrawGridBackground(false);
         // barChart.setDrawYLabels(false);
-        Log.d(AppHelper.TAG, "***App list size - "+values.length);
-        Log.d(AppHelper.TAG, "***App name list size - "+appNameList.size());
-
         IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart, appNameList);
 
         XAxis xAxis = barChart.getXAxis();
@@ -259,6 +241,10 @@ public class StatsFragment extends Fragment {
             data.setValueTextSize(10f);
             data.setBarWidth(0.2f);
             barChart.setData(data);
+//            barChart.setVisibleXRangeMaximum(5); // allow 20 values to be displayed at once on the x-axis, not more
+//            barChart.moveViewToX(10);
+            barChart.setVisibleXRangeMaximum(5.0f);
+//            barChart.setVisibleXRangeMinimum(5.0f);
         }
     }
 

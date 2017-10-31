@@ -93,8 +93,6 @@ public class SettingsActivity extends AppCompatActivity implements
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
-//                if (lUsageStatsMap.containsKey(info.packageName)) {
-//                    Log.d(AppHelper.TAG, "info = "+info.packageName);
                     boolean isChecked = false;
                     if (prefList.contains(info.packageName)) {
                         isChecked = true;
@@ -104,7 +102,6 @@ public class SettingsActivity extends AppCompatActivity implements
                             info.loadIcon(packageManager),
                             isChecked));
                     count++;
-//                    Log.d(AppHelper.TAG, "app list size - "+packageManager.getLaunchIntentForPackage(info.packageName));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -115,7 +112,6 @@ public class SettingsActivity extends AppCompatActivity implements
 
     @Override
     public void onListChanged(String pkgName, boolean isChecked) {
-//        String pkgName = appList.get(position).getAppPkgName();
         if (isChecked) {
             if (!prefList.contains(pkgName)) {
                 prefList.add(pkgName);

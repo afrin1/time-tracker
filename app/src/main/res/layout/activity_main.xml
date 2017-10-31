@@ -29,10 +29,19 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <android.support.v4.view.ViewPager
+    <com.afdroid.timetracker.Utils.CustomViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_below="@id/tab_layout"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/tutorial_screen"
+        android:visibility="invisible"
+        layout="@layout/view_tutorial_screen" />
+
+
 
 </RelativeLayout>

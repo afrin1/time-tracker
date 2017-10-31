@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88303F9F">
+
+    <Button
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/ic_close"
+        android:onClick="onClosePressed"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/steps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/steps"
+            android:textColor="#ffffff"
+            android:layout_margin="10dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"/>
+
+        <com.afdroid.timetracker.Utils.TextViewWithImages
+            android:id="@+id/step_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="15dp"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/steps"
+            android:text="@string/step_1"/>
+
+        <com.afdroid.timetracker.Utils.TextViewWithImages
+            android:id="@+id/step_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="15dp"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/step_1"
+            android:text="@string/step_2"/>
+
+        <TextView
+            android:id="@+id/step_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/step_2"
+            android:text="@string/step_3"
+            android:textColor="#ffffff"
+            android:layout_margin="10dp"
+            android:textSize="15dp"/>
+
+        <TextView
+            android:id="@+id/step_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/step_3"
+            android:text="@string/step_4"
+            android:textColor="#ffffff"
+            android:layout_margin="10dp"
+            android:textSize="15dp"/>
+
+        <TextView
+            android:id="@+id/step_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/step_4"
+            android:text="@string/step_5"
+            android:textColor="#ffffff"
+            android:layout_margin="10dp"
+            android:textSize="15dp"/>
+    </RelativeLayout>
+
+</RelativeLayout>

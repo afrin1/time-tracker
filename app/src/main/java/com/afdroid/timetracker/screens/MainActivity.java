@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.afdroid.timetracker.R;
@@ -32,9 +33,11 @@ import static com.afdroid.timetracker.Utils.AppHelper.initAppHelper;
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
+    private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
+    private RelativeLayout tutorialView;
     private List<String> prefList = new ArrayList<String>();
 
     @Override
@@ -42,14 +45,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tutorialView = (RelativeLayout) findViewById(R.id.tutorial_screen);
         setSupportActionBar(toolbar);
-        toolbar.setLogo(R.mipmap.ic_launcher2);
+        toolbar.setLogo(R.drawable.ic_clock);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
 //        setAppList();
+        setTutorialScreen();
         createLayout();
     }
 
@@ -99,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
                 prefList);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        /*viewPager.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                return true;
+            }
+        });*/
+
     }
 
     private void fillStats() {
@@ -153,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_refresh:
                 setViewPager();
+                return true;
+            case R.id.action_info:
+                showTutorialView();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -163,5 +178,30 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.action_bar_main_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void onClosePressed(View view) {
+        hideTutorialView();
+    }
+
+    private void hideTutorialView() {
+        tutorialView.setVisibility(View.INVISIBLE);
+        toolbar.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
+    }
+
+    private void setTutorialScreen() {
+        if (TimeTrackerPrefHandler.INSTANCE.getIsFirstTime(getApplicationContext())) {
+            showTutorialView();
+            TimeTrackerPrefHandler.INSTANCE.saveIsFirstTime(false, getApplicationContext());
+        }
+    }
+
+    private void showTutorialView() {
+        tutorialView.setVisibility(View.VISIBLE);
+        toolbar.setVisibility(View.INVISIBLE);
+        tabLayout.setVisibility(View.INVISIBLE);
+        viewPager.setVisibility(View.INVISIBLE);
     }
 }

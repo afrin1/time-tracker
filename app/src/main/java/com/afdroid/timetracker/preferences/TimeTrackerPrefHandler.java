@@ -14,6 +14,7 @@ import com.afdroid.timetracker.Utils.AppHelper;
 public enum TimeTrackerPrefHandler {
     INSTANCE;
     public static final String PREF_LIST = "pref_list";
+    public static final String IS_FIRST_TIME = "is_first_time";
     private SharedPreferences sharedPreferences = null;
 
     public void savePkgList(String pkgName, Context ctx) {
@@ -29,5 +30,17 @@ public enum TimeTrackerPrefHandler {
         Log.d(AppHelper.TAG, "***get package name = "+sharedPreferences.
                 getString(PREF_LIST, null));
         return sharedPreferences.getString(PREF_LIST, null);
+    }
+
+    public void saveIsFirstTime(boolean isFirstTime, Context ctx) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putBoolean(IS_FIRST_TIME, isFirstTime);
+        e.apply();
+    }
+
+    public boolean getIsFirstTime(Context ctx) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return sharedPreferences.getBoolean(IS_FIRST_TIME, true);
     }
 }
