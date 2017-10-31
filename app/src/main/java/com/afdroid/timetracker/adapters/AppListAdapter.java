@@ -46,6 +46,7 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             Log.d(AppHelper.TAG, " Switch changed - "+b);
+            data.get(getAdapterPosition()).setSelectedForStats(b);
             onSettingsChangedListener.onListChanged(data.get(getAdapterPosition()).getAppPkgName(),
                     appSwitch.isChecked());
         }

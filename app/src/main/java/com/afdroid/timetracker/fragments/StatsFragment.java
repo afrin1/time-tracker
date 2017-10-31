@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
@@ -72,6 +71,8 @@ public class StatsFragment extends Fragment {
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList
                 (getActivity().getApplicationContext());
         if (serialized != null) {
+            appList = null;
+            appNameList = null;
             appList = new LinkedList<String>(Arrays.asList(TextUtils.
                     split(serialized, ",")));
             appNameList = new LinkedList<String>();
@@ -124,9 +125,9 @@ public class StatsFragment extends Fragment {
 //        }
 
         if (appList != null) {
-            if (appNameList != null) {
-                appNameList.clear();
-            }
+//            if (appNameList != null) {
+//                appNameList.clear();
+//            }
             PackageManager packageManager= getActivity().getApplicationContext().getPackageManager();
             float[] values = new float[appList.size()];
 
@@ -135,14 +136,14 @@ public class StatsFragment extends Fragment {
                 Log.d(AppHelper.TAG, " StatsFragment :: app - "+appPkg);
                 String appname = null;
                 try {
-                    appname = (String) packageManager.getApplicationLabel(packageManager.
-                            getApplicationInfo(appPkg, PackageManager.GET_META_DATA));
+                    appNameList.add((String) packageManager.getApplicationLabel(packageManager.
+                            getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
                 } catch (PackageManager.NameNotFoundException e) {
+                    Log.d(AppHelper.TAG, "name not added");
                     e.printStackTrace();
                 }
                 if (lUsageStatsMap.containsKey(appPkg)) {
-
-                    appNameList.add(appname);
+//                    appNameList.add(appname);
                     if (selectedPeriod == DAILY) {
                         values[i] = AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
                                 getTotalTimeInForeground());
@@ -154,30 +155,18 @@ public class StatsFragment extends Fragment {
                 } else {
                     //if device does not contain the app,
                     // remove from the preference list
-                    Log.d(AppHelper.TAG, " StatsFragment :: remove from list");
+                   /* Log.d(AppHelper.TAG, " StatsFragment :: remove from list");
                     appList.remove(appPkg);
+                    appNameList.remove(appname);
                     Toast.makeText(getActivity().getApplicationContext(),
                             "Usage info not available for app - "+appname,
-                            Toast.LENGTH_SHORT).show();
+                            Toast.LENGTH_SHORT).show();*/
+                    values[i] = 0.0f;
                 }
             }
             saveAppPreference();
             setChart(values);
         }
-
-        /*  float seconds = mills / 1000;
-            float minutes = seconds / 60;
-            float hours = minutes / 60;
-            String time = hours % 24 + ":" + minutes % 60 + ":" + seconds % 60;
-            Log.d(TAG, "********* \nTime FM = "+time);
-
-            float convsec = (seconds % 60/60);
-            float convmin = minutes % 60/60;
-            float hrs = hours % 24 + convmin;
-            Log.d(TAG, "FB hours coverted = "+hrs + " conv mins = "+convmin+ " conv sec = "+convsec);
-            Log.d(TAG, "FB hours = "+values[FB]);
-        */
-
     }
 
     private void saveAppPreference() {
@@ -194,13 +183,17 @@ public class StatsFragment extends Fragment {
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        barChart.setMaxVisibleValueCount(60);
+//        barChart.setMaxVisibleValueCount(60);
+        barChart.setVisibleXRangeMaximum(6);
+        barChart.moveViewToX(10);
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
 
         barChart.setDrawGridBackground(false);
         // barChart.setDrawYLabels(false);
+        Log.d(AppHelper.TAG, "***App list size - "+values.length);
+        Log.d(AppHelper.TAG, "***App name list size - "+appNameList.size());
 
         IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(barChart, appNameList);
 
