@@ -15,6 +15,12 @@ public class AppHelper {
     public static final String WHATSAPP_PKG_NAME = "com.whatsapp";
     public static final String INSTAGRAM_PKG_NAME = "com.instagram.android";
 
+    public static final String APP_ID = "ca-app-pub-3912594581926590~9557935914";
+
+//    Ad unit name: tracker_ad
+//    App ID: ca-app-pub-3912594581926590~9557935914
+//    Ad unit ID: ca-app-pub-3912594581926590/5234837081
+
     public final static int FB = 0;
     public final static int WA = 2;
     public final static int FB_MSG = 1;

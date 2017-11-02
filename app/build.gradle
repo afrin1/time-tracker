@@ -28,5 +28,6 @@ dependencies {
     compile 'com.android.support:support-v4:25.4.0'
     compile 'com.android.support:recyclerview-v7:25.4.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.google.android.gms:play-services-ads:11.4.2'
     testCompile 'junit:junit:4.12'
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Time Tracker</string>
+    <string name="app_name">App Usage Tracker</string>
     <string name="daily_stats">Daily</string>
     <string name="weekly_stats">Weekly</string>
     <string name="monthly_stats">Monthly</string>
@@ -22,4 +22,6 @@
         to get a clear look</string>
     <string name="step_5">Scroll horizontally to
         view the usage time for all the apps selected</string>
+    <!--<string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>  &lt;!&ndash;// //add test&ndash;&gt;-->
+    <string name="adUnitId">ca-app-pub-3912594581926590/5234837081</string>
 </resources>

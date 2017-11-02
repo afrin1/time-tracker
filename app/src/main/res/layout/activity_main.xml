@@ -29,11 +29,29 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <com.afdroid.timetracker.Utils.CustomViewPager
-        android:id="@+id/pager"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@id/tab_layout"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tab_layout"
+        android:orientation="vertical">
+
+        <com.afdroid.timetracker.Utils.CustomViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_below="@id/tab_layout"/>
+
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/adUnitId">
+        </com.google.android.gms.ads.AdView>
+
+    </LinearLayout>
 
     <include
         android:layout_width="fill_parent"
@@ -41,7 +59,5 @@
         android:id="@+id/tutorial_screen"
         android:visibility="invisible"
         layout="@layout/view_tutorial_screen" />
-
-
 
 </RelativeLayout>

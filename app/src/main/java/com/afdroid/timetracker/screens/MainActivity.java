@@ -22,6 +22,9 @@ import com.afdroid.timetracker.R;
 import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.adapters.PagerAdapter;
 import com.afdroid.timetracker.preferences.TimeTrackerPrefHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,16 +42,27 @@ public class MainActivity extends AppCompatActivity {
     private PagerAdapter pagerAdapter;
     private RelativeLayout tutorialView;
     private List<String> prefList = new ArrayList<String>();
+    private AdView mAdView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MobileAds.initialize(this, AppHelper.APP_ID);
+//        MobileAds.initialize(this,
+//                "ca-app-pub-3940256099942544~3347511713"); //add test
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tutorialView = (RelativeLayout) findViewById(R.id.tutorial_screen);
         setSupportActionBar(toolbar);
-        toolbar.setLogo(R.drawable.ic_clock);
+//        toolbar.setLogo(R.drawable.ic_clock);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
