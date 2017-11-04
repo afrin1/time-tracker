@@ -10,22 +10,7 @@ import android.content.Context;
 public class AppHelper {
 
     public static final String TAG = "TIME_TRACKER";
-    public static final String FB_PKG_NAME = "com.facebook.katana";
-    public static final String FB_MSG_PKG_NAME = "com.facebook.orca";
-    public static final String WHATSAPP_PKG_NAME = "com.whatsapp";
-    public static final String INSTAGRAM_PKG_NAME = "com.instagram.android";
-
     public static final String APP_ID = "ca-app-pub-3912594581926590~9557935914";
-
-//    Ad unit name: tracker_ad
-//    App ID: ca-app-pub-3912594581926590~9557935914
-//    Ad unit ID: ca-app-pub-3912594581926590/5234837081
-
-    public final static int FB = 0;
-    public final static int WA = 2;
-    public final static int FB_MSG = 1;
-    public final static int INST = 3;
-
     public final static int DAILY_STATS = 0;
     public final static int WEEKLY_STATS = 1;
     public final static int MONTHLY_STATS = 2;

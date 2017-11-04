@@ -33,13 +33,6 @@
             android:maxLines="1"
             android:ellipsize="end"/>
 
-        <!--<TextView
-            android:id="@+id/txt_time_used"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="3dp"/>-->
-
     </LinearLayout>
 
     <Switch

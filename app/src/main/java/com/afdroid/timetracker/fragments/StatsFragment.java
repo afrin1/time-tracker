@@ -121,15 +121,11 @@ public class StatsFragment extends Fragment {
         endTime.setText("To "+sdf.format(endresultdate));
 
         if (appList != null) {
-//            if (appNameList != null) {
-//                appNameList.clear();
-//            }
             PackageManager packageManager= getActivity().getApplicationContext().getPackageManager();
             float[] values = new float[appList.size()];
 
             for (int i = 0; i < appList.size(); i++) {
                 String appPkg = appList.get(i);
-                String appname = null;
                 try {
                     appNameList.add((String) packageManager.getApplicationLabel(packageManager.
                             getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
@@ -137,7 +133,6 @@ public class StatsFragment extends Fragment {
                     e.printStackTrace();
                 }
                 if (lUsageStatsMap.containsKey(appPkg)) {
-//                    appNameList.add(appname);
                     if (selectedPeriod == DAILY) {
                         values[i] = AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
                                 getTotalTimeInForeground());
@@ -241,10 +236,7 @@ public class StatsFragment extends Fragment {
             data.setValueTextSize(10f);
             data.setBarWidth(0.2f);
             barChart.setData(data);
-//            barChart.setVisibleXRangeMaximum(5); // allow 20 values to be displayed at once on the x-axis, not more
-//            barChart.moveViewToX(10);
             barChart.setVisibleXRangeMaximum(5.0f);
-//            barChart.setVisibleXRangeMinimum(5.0f);
         }
     }
 

@@ -212,8 +212,6 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        TimeTrackerPrefHandler.INSTANCE.savePkgList
-//                (TextUtils.join(",", prefList), this);
     }
 
     @Override

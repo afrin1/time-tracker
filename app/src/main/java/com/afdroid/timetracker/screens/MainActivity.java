@@ -62,12 +62,10 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tutorialView = (RelativeLayout) findViewById(R.id.tutorial_screen);
         setSupportActionBar(toolbar);
-//        toolbar.setLogo(R.drawable.ic_clock);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-//        setAppList();
         setTutorialScreen();
         createLayout();
     }
@@ -82,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
     private void createLayout() {
         setTabLayout();
         setViewPager();
-//        initAppHelper(getApplicationContext());
         fillStats();
     }
 
@@ -118,12 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 prefList);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        /*viewPager.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                return true;
-            }
-        });*/
-
     }
 
     private void fillStats() {
