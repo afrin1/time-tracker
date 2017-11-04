@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -89,7 +88,6 @@ public class SettingsActivity extends AppCompatActivity implements
                 queryAndAggregateUsageStats(
                         millis,
                         System.currentTimeMillis());
-        Log.d(AppHelper.TAG, "app list 2 size - "+lUsageStatsMap.keySet().size());
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
@@ -107,7 +105,6 @@ public class SettingsActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
         }
-        Log.d(AppHelper.TAG, "App list size - "+count);
     }
 
     @Override
@@ -131,8 +128,6 @@ public class SettingsActivity extends AppCompatActivity implements
         protected Void doInBackground(Void... params) {
             checkForLaunchIntent(
                     packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
-            Log.d(AppHelper.TAG, "installed app list size = "+
-                    packageManager.getInstalledApplications(PackageManager.GET_META_DATA).size());
             Collections.sort(appList, new Comparator<AppInfo>() {
                 @Override
                 public int compare(AppInfo lhs, AppInfo rhs) {
@@ -217,7 +212,6 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(AppHelper.TAG, " SettingsActivity :: savepref");
         TimeTrackerPrefHandler.INSTANCE.savePkgList
                 (TextUtils.join(",", prefList), this);
     }

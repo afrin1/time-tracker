@@ -2,7 +2,6 @@ package com.afdroid.timetracker.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afdroid.timetracker.R;
-import com.afdroid.timetracker.Utils.AppHelper;
 import com.afdroid.timetracker.Utils.AppInfo;
 import com.afdroid.timetracker.screens.SettingsActivity;
 
@@ -45,7 +43,6 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-            Log.d(AppHelper.TAG, " Switch changed - "+b);
             data.get(getAdapterPosition()).setSelectedForStats(b);
             onSettingsChangedListener.onListChanged(data.get(getAdapterPosition()).getAppPkgName(),
                     appSwitch.isChecked());
@@ -58,7 +55,6 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public AppListAdapter(Context context, List<AppInfo> data) {
         super();
-        Log.d(AppHelper.TAG, "AppListAdapter - ");
         this.context = context;
         this.data = data;
     }

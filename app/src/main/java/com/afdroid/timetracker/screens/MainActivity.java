@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-//        setTutorialScreen();
         createLayout();
         setTutorialScreen();
     }
@@ -129,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(AppHelper.TAG, "MainActivity :: onResume");
         setAppList();
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
                 prefList);
@@ -138,11 +135,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("MainActivity", "resultCode " + resultCode);
         switch (requestCode){
             case MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS:
                 fillStats();
-//                tabLayout.setVisibility(View.VISIBLE);
                 break;
         }
     }

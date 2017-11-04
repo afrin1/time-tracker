@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static android.content.ContentValues.TAG;
-
 public class StatsFragment extends Fragment {
     private BarChart barChart;
 
@@ -60,7 +57,6 @@ public class StatsFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         Bundle args = getArguments();
         selectedPeriod = args.getInt("period", 0);
-        Log.d(AppHelper.TAG, "StatsFragment :: oncreateviewholder");
         barChart = (BarChart) rootView.findViewById(R.id.chart1);
         barChart.setNoDataText(getResources().getString(R.string.no_data));
         startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
@@ -71,7 +67,6 @@ public class StatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(AppHelper.TAG, "StatsFragment :: onResume");
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList
                 (getActivity().getApplicationContext());
         if (serialized != null) {
@@ -209,7 +204,6 @@ public class StatsFragment extends Fragment {
 
         for (int i = 0; i <  appList.size(); i++) {
             float val =  values[i];
-            Log.d(TAG, "bar chart value = "+val);
             yVals1.add(new BarEntry(i, val));
         }
 
