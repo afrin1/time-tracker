@@ -22,6 +22,7 @@
         to get a clear look</string>
     <string name="step_5">Scroll horizontally to
         view the usage time for all the apps selected</string>
+    <string name="no_data">Select apps from Settings screen to view its usage info</string>
     <!--<string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>  &lt;!&ndash;// //add test&ndash;&gt;-->
     <string name="adUnitId">ca-app-pub-3912594581926590/5234837081</string>
 </resources>

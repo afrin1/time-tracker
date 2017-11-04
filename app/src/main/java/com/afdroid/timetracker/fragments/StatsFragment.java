@@ -61,6 +61,10 @@ public class StatsFragment extends Fragment {
         Bundle args = getArguments();
         selectedPeriod = args.getInt("period", 0);
         Log.d(AppHelper.TAG, "StatsFragment :: oncreateviewholder");
+        barChart = (BarChart) rootView.findViewById(R.id.chart1);
+        barChart.setNoDataText(getResources().getString(R.string.no_data));
+        startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
+        endTime = (TextView) rootView.findViewById(R.id.tvEndTime);
         return rootView;
     }
 
@@ -77,11 +81,6 @@ public class StatsFragment extends Fragment {
                     split(serialized, ",")));
             appNameList = new LinkedList<String>();
         }
-
-        barChart = (BarChart) rootView.findViewById(R.id.chart1);
-        startTime = (TextView) rootView.findViewById(R.id.tvStartTime);
-        endTime = (TextView) rootView.findViewById(R.id.tvEndTime);
-
         getStatsInfo();
     }
 
@@ -147,7 +146,9 @@ public class StatsFragment extends Fragment {
                 }
             }
             saveAppPreference();
-            setChart(values);
+            if (values.length != 0) {
+                setChart(values);
+            }
         }
     }
 

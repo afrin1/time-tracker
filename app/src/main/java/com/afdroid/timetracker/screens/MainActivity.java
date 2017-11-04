@@ -66,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        setTutorialScreen();
+//        setTutorialScreen();
         createLayout();
+        setTutorialScreen();
     }
 
     private void setAppList() {
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS:
                 fillStats();
-                tabLayout.setVisibility(View.VISIBLE);
+//                tabLayout.setVisibility(View.VISIBLE);
                 break;
         }
     }
