@@ -1,5 +1,6 @@
 package com.afdroid.timetracker.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.usage.UsageStats;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -103,7 +104,7 @@ public class StatsFragment extends Fragment {
                 break;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date startresultdate = new Date(millis);
         Date endresultdate = new Date(System.currentTimeMillis());
         Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
@@ -231,7 +232,7 @@ public class StatsFragment extends Fragment {
             data.setValueTextSize(10f);
             data.setBarWidth(0.2f);
             barChart.setData(data);
-            barChart.setVisibleXRangeMaximum(5.0f);
+            barChart.setVisibleXRangeMaximum(4.0f);
         }
     }
 
