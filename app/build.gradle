@@ -7,14 +7,19 @@ android {
         applicationId 'com.afdroid.timetracker'
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 3
+        versionCode 4
         versionName "2.1"
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                    "$project.rootDir/tools/rules-proguard.pro"
+                    "$project.rootDir/proguard_rules.pro"
+        }
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    "$project.rootDir/proguard_rules.pro"
         }
     }
     productFlavors {
