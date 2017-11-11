@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,32 +118,42 @@ public class StatsFragment extends Fragment {
 
         if (appList != null) {
             PackageManager packageManager= getActivity().getApplicationContext().getPackageManager();
-            float[] values = new float[appList.size()];
+            ArrayList<Float> values = new ArrayList<Float>();
 
             for (int i = 0; i < appList.size(); i++) {
                 String appPkg = appList.get(i);
+                String appname = null;
                 try {
-                    appNameList.add((String) packageManager.getApplicationLabel(packageManager.
-                            getApplicationInfo(appPkg, PackageManager.GET_META_DATA)));
+                    appname = (String) packageManager.getApplicationLabel(packageManager.
+                            getApplicationInfo(appPkg, PackageManager.GET_META_DATA));
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
-                if (lUsageStatsMap.containsKey(appPkg)) {
-                    if (selectedPeriod == DAILY) {
-                        values[i] = AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
-                                getTotalTimeInForeground());
+                if (appname != null) {
+                    appNameList.add(appname);
+                    if (lUsageStatsMap.containsKey(appPkg)) {
+                        if (selectedPeriod == DAILY) {
+                            values.add(AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
+                                    getTotalTimeInForeground()));
+                        } else {
+                            values.add(AppHelper.getHours(lUsageStatsMap.get(appPkg).
+                                    getTotalTimeInForeground()));
+                        }
 
                     } else {
-                        values[i] = AppHelper.getHours(lUsageStatsMap.get(appPkg).
-                                getTotalTimeInForeground());
+                        //if device does not contain the app usage data
+                        values.add(0.0f);
                     }
-                } else {
-                    //if device does not contain the app usage data
-                    values[i] = 0.0f;
+                }
+                else {
+                    appList.remove(appPkg);
                 }
             }
             saveAppPreference();
-            if (values.length != 0) {
+            Log.d(AppHelper.TAG, "applist size - "+appList.size());
+            Log.d(AppHelper.TAG, "appnamelist size - "+appNameList.size());
+            Log.d(AppHelper.TAG, "values size - "+values.size());
+            if (values.size() != 0) {
                 setChart(values);
             }
         }
@@ -153,7 +164,7 @@ public class StatsFragment extends Fragment {
                 (TextUtils.join(",", appList), getActivity().getApplicationContext());
     }
 
-    private void setChart(float[] values) {
+    private void setChart(ArrayList<Float> values) {
         barChart.setDrawBarShadow(false);
         barChart.setDrawValueAboveBar(true);
         barChart.getDescription().setEnabled(false);
@@ -175,7 +186,7 @@ public class StatsFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setLabelCount(appList.size());
+        xAxis.setLabelCount(appNameList.size());
         xAxis.setValueFormatter(xAxisFormatter);
 
         YAxis leftAxis = barChart.getAxisLeft();
@@ -200,11 +211,11 @@ public class StatsFragment extends Fragment {
         setData(values);
     }
 
-    private void setData(float[] values) {
+    private void setData(ArrayList<Float> values) {
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        for (int i = 0; i <  appList.size(); i++) {
-            float val =  values[i];
+        for (int i = 0; i <  values.size(); i++) {
+            float val =  values.get(i);
             yVals1.add(new BarEntry(i, val));
         }
 
