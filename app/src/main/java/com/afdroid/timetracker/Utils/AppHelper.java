@@ -12,8 +12,9 @@ public class AppHelper {
     public static final String TAG = "TIME_TRACKER";
     public static final String APP_ID = "ca-app-pub-3912594581926590~9557935914";
     public final static int DAILY_STATS = 0;
-    public final static int WEEKLY_STATS = 1;
-    public final static int MONTHLY_STATS = 2;
+    public final static int YESTERDAY_STATS = 1;
+    public final static int WEEKLY_STATS = 2;
+    public final static int MONTHLY_STATS = 3;
 
     private static UsageStatsManager mUsageStatsManager;
 

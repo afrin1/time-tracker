@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">App Usage Tracker</string>
-    <string name="daily_stats">Daily</string>
-    <string name="weekly_stats">Weekly</string>
-    <string name="monthly_stats">Monthly</string>
+    <string name="daily_stats">Today</string>
+    <string name="yesterday_stats">Yesterday</string>
+    <string name="weekly_stats">Week</string>
+    <string name="monthly_stats">Month</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

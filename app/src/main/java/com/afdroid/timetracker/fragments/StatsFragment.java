@@ -46,6 +46,7 @@ public class StatsFragment extends Fragment {
     private View rootView;
 
     private final int DAILY = AppHelper.DAILY_STATS;
+    private final int YESTERDAY = AppHelper.YESTERDAY_STATS;
     private final int WEEKLY = AppHelper.WEEKLY_STATS;
     private final int MONTHLY = AppHelper.MONTHLY_STATS;
 
@@ -89,9 +90,20 @@ public class StatsFragment extends Fragment {
         calendar.set(Calendar.MILLISECOND, 0);
         long millis = 0;
 
+        Date endresultdate = new Date(System.currentTimeMillis());
         switch (selectedPeriod) {
             case DAILY:
                 millis = calendar.getTimeInMillis();
+                break;
+            case YESTERDAY:
+                calendar.set(Calendar.HOUR_OF_DAY, -24);
+                millis = calendar.getTimeInMillis();
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                calendar.set(Calendar.MILLISECOND, 99);
+                Date date = calendar.getTime();
+                endresultdate = date;
                 break;
             case WEEKLY:
                 calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
@@ -107,7 +119,7 @@ public class StatsFragment extends Fragment {
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date startresultdate = new Date(millis);
-        Date endresultdate = new Date(System.currentTimeMillis());
+
         Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
                 queryAndAggregateUsageStats(
                 millis,
