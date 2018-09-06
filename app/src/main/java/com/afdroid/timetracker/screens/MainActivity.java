@@ -3,6 +3,9 @@ package com.afdroid.timetracker.screens;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.TabLayout;
@@ -10,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,11 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private PagerAdapter pagerAdapter;
+    private static PagerAdapter pagerAdapter;
     private RelativeLayout tutorialView;
     private List<String> prefList = new ArrayList<String>();
     private AdView mAdView;
-
+    private String[] defaultList =  {"com.facebook.katana", "com.instagram.android", "com.whatsapp","com.android.chrome", "com.twitter.android"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,14 +69,17 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        createLayout();
+        prefList = new LinkedList<String>();
+
         setTutorialScreen();
+        createLayout();
     }
 
     private void setAppList() {
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(getApplicationContext());
         if (serialized != null) {
-            prefList = new LinkedList<String>(Arrays.asList(TextUtils.split(serialized, ",")));
+            prefList = Arrays.asList(TextUtils.split(serialized, ","));
+            setViewPager();
         }
     }
 
@@ -114,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
                 prefList);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(0);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
     }
 
@@ -129,9 +137,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setAppList();
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
-                prefList);
-        viewPager.setAdapter(pagerAdapter);
+//        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
+//                prefList);
+//        viewPager.setAdapter(pagerAdapter);
+        Log.d("MainActivity", "onResume: ");
     }
 
     @Override
@@ -166,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_refresh:
                 setViewPager();
+//                pagerAdapter.notifyDataSetChanged();
                 return true;
             case R.id.action_info:
                 showTutorialView();
@@ -196,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
     private void setTutorialScreen() {
         if (TimeTrackerPrefHandler.INSTANCE.getIsFirstTime(getApplicationContext())) {
             showTutorialView();
+            setDefaultSelection();
             TimeTrackerPrefHandler.INSTANCE.saveIsFirstTime(false, getApplicationContext());
         }
     }
@@ -205,5 +216,19 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setVisibility(View.INVISIBLE);
         tabLayout.setVisibility(View.INVISIBLE);
         viewPager.setVisibility(View.INVISIBLE);
+    }
+
+    private void setDefaultSelection() {
+        PackageManager pm = getPackageManager();
+        for (String packageName : defaultList) {
+            Intent intent = pm.getLaunchIntentForPackage(packageName);
+            if (intent != null) {
+                List<ResolveInfo> list = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                if(list.size() > 0) {
+                    prefList.add(packageName);
+                }
+            }
+        }
+        TimeTrackerPrefHandler.INSTANCE.savePkgList(TextUtils.join(",", prefList), this);
     }
 }
