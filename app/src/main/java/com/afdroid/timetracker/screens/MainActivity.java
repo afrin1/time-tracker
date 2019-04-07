@@ -3,7 +3,6 @@ package com.afdroid.timetracker.screens;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -42,16 +41,19 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private TabLayout mainTabLayout;
     private static PagerAdapter pagerAdapter;
     private RelativeLayout tutorialView;
     private List<String> prefList = new ArrayList<String>();
     private AdView mAdView;
-    private String[] defaultList =  {"com.facebook.katana", "com.instagram.android", "com.whatsapp","com.android.chrome", "com.twitter.android"};
+    private String[] defaultList = {"com.facebook.katana", "com.instagram.android", "com.whatsapp", "com.android.chrome", "com.twitter.android"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TimeTrackerPrefHandler.INSTANCE.setMode(0, getApplicationContext());
 
         MobileAds.initialize(this, AppHelper.APP_ID);
 //        MobileAds.initialize(this,
@@ -69,10 +71,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
+        mainTabLayout = (TabLayout) findViewById(R.id.main_tab_layout);
+//        mainViewPager = (ViewPager) findViewById(R.id.pager);
+
         prefList = new LinkedList<String>();
 
         setTutorialScreen();
         createLayout();
+
     }
 
     private void setAppList() {
@@ -84,9 +90,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createLayout() {
+        setMainTabLayout();
         setTabLayout();
         setViewPager();
         fillStats();
+    }
+
+    private void setMainTabLayout() {
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(getString(R.string.app)));
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(getString(R.string.network)));
+        mainTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        mainTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                TimeTrackerPrefHandler.INSTANCE.setMode(tab.getPosition(), getApplicationContext());
+                setViewPager();
+                Log.e("NETWORK_USAGE", "current mode : " + tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     private void setTabLayout() {
@@ -115,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager() {
-        if (pagerAdapter!= null) {
+        if (pagerAdapter != null) {
             pagerAdapter = null;
         }
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
@@ -126,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fillStats() {
-        if (hasPermission()){
+        if (hasPermission()) {
             initAppHelper(getApplicationContext());
-        }else{
+        } else {
             requestPermission();
         }
     }
@@ -145,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS:
                 fillStats();
                 break;
@@ -186,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.action_bar_main_menu, menu);
         return super.onCreateOptionsMenu(menu);
@@ -224,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = pm.getLaunchIntentForPackage(packageName);
             if (intent != null) {
                 List<ResolveInfo> list = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-                if(list.size() > 0) {
+                if (list.size() > 0) {
                     prefList.add(packageName);
                 }
             }

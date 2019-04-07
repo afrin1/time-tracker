@@ -1,9 +1,14 @@
 package com.afdroid.timetracker.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
 import android.app.usage.UsageStats;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -51,6 +56,7 @@ public class StatsFragment extends Fragment {
     private final int MONTHLY = AppHelper.MONTHLY_STATS;
 
     private int selectedPeriod = 0;
+    private int mode = 0;
     private List<String> appList = null;
     private List<String> appNameList = null;
 
@@ -70,6 +76,7 @@ public class StatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        mode = TimeTrackerPrefHandler.INSTANCE.getMode(getActivity().getApplicationContext());
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList
                 (getActivity().getApplicationContext());
         if (serialized != null) {
@@ -122,49 +129,86 @@ public class StatsFragment extends Fragment {
 
         Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
                 queryAndAggregateUsageStats(
-                millis,
-                System.currentTimeMillis());
+                        millis,
+                        System.currentTimeMillis());
 
-        startTime.setText("From "+sdf.format(startresultdate));
-        endTime.setText("To "+sdf.format(endresultdate));
+        startTime.setText("From " + sdf.format(startresultdate));
+        endTime.setText("To " + sdf.format(endresultdate));
 
         if (appList != null) {
-            PackageManager packageManager= getActivity().getApplicationContext().getPackageManager();
+            PackageManager packageManager = getActivity().getApplicationContext().getPackageManager();
             ArrayList<Float> values = new ArrayList<Float>();
+            ApplicationInfo info = null;
 
             for (int i = 0; i < appList.size(); i++) {
                 String appPkg = appList.get(i);
                 String appname = null;
+                int uid = 0;
                 try {
                     appname = (String) packageManager.getApplicationLabel(packageManager.
                             getApplicationInfo(appPkg, PackageManager.GET_META_DATA));
+                    info = packageManager.getApplicationInfo(appPkg, 0);
+
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
+
+
                 if (appname != null) {
                     appNameList.add(appname);
-                    if (lUsageStatsMap.containsKey(appPkg)) {
-                        if (selectedPeriod == DAILY) {
-                            values.add(AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
-                                    getTotalTimeInForeground()));
-                        } else {
-                            values.add(AppHelper.getHours(lUsageStatsMap.get(appPkg).
-                                    getTotalTimeInForeground()));
-                        }
 
+
+                    if (mode == 1) {
+                        // network test
+                        uid = info.uid;
+                        NetworkStatsManager networkStatsManager;
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            networkStatsManager = (NetworkStatsManager) getActivity().getApplicationContext().getSystemService(Context.NETWORK_STATS_SERVICE);
+                            NetworkStats nwStats = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null, millis, System.currentTimeMillis(), uid);
+                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                            nwStats.getNextBucket(bucket);
+                            double received = (double) bucket.getRxBytes() / (1024 * 1024);
+                            double send = (double) bucket.getTxBytes() / (1024 * 1024);
+                            double total = received + send;
+
+                            NetworkStats nwStats1 = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null, millis, System.currentTimeMillis(), uid);
+                            NetworkStats.Bucket bucket1 = new NetworkStats.Bucket();
+                            nwStats1.getNextBucket(bucket1);
+                            double received1 = (double) bucket1.getRxBytes() / (1024 * 1024);
+                            double send1 = (double) bucket1.getTxBytes() / (1024 * 1024);
+                            double total1 = received1 + send1;
+                            double totalAll = total + total1;
+
+                            values.add(((float) totalAll));
+
+//                        Log.e("NETWORK_USAGE", "appname : "+appname+ " : "+String.format("%.2f", totalAll) + " MB");
+                        }
                     } else {
-                        //if device does not contain the app usage data
-                        values.add(0.0f);
+                        if (lUsageStatsMap.containsKey(appPkg)) {
+                            if (selectedPeriod == DAILY) {
+                                values.add(AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
+                                        getTotalTimeInForeground()));
+                            } else {
+                                values.add(AppHelper.getHours(lUsageStatsMap.get(appPkg).
+                                        getTotalTimeInForeground()));
+                            }
+
+                        } else {
+                            //if device does not contain the app usage data
+                            values.add(0.0f);
+                        }
                     }
-                }
-                else {
+
+
+                } else {
                     appList.remove(appPkg);
                 }
             }
             saveAppPreference();
-            Log.d(AppHelper.TAG, "applist size - "+appList.size());
-            Log.d(AppHelper.TAG, "appnamelist size - "+appNameList.size());
-            Log.d(AppHelper.TAG, "values size - "+values.size());
+            Log.d(AppHelper.TAG, "applist size - " + appList.size());
+            Log.d(AppHelper.TAG, "appnamelist size - " + appNameList.size());
+            Log.d(AppHelper.TAG, "values size - " + values.size());
             if (values.size() != 0) {
                 setChart(values);
             }
@@ -226,8 +270,8 @@ public class StatsFragment extends Fragment {
     private void setData(ArrayList<Float> values) {
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        for (int i = 0; i <  values.size(); i++) {
-            float val =  values.get(i);
+        for (int i = 0; i < values.size(); i++) {
+            float val = values.get(i);
             yVals1.add(new BarEntry(i, val));
         }
 
@@ -239,13 +283,11 @@ public class StatsFragment extends Fragment {
             set1.setValues(yVals1);
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
-        }
-        else {
+        } else {
             if (selectedPeriod == DAILY) {
-                set1 = new BarDataSet(yVals1, "App usage in Minutes");
-            }
-            else {
-                set1 = new BarDataSet(yVals1, "App usage in Hours");
+                set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Minutes" : "MB"));
+            } else {
+                set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Hours" : "MB"));
             }
             set1.setDrawIcons(false);
             set1.setColors(ColorTemplate.MATERIAL_COLORS);

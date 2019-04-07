@@ -12,6 +12,7 @@ public enum TimeTrackerPrefHandler {
     INSTANCE;
     public static final String PREF_LIST = "pref_list";
     public static final String IS_FIRST_TIME = "is_first_time";
+    public static final String MODE = "mode";
     private SharedPreferences sharedPreferences = null;
 
     public void savePkgList(String pkgName, Context ctx) {
@@ -36,5 +37,17 @@ public enum TimeTrackerPrefHandler {
     public boolean getIsFirstTime(Context ctx) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         return sharedPreferences.getBoolean(IS_FIRST_TIME, true);
+    }
+
+    public void setMode(int mode, Context ctx) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putInt(MODE, mode);
+        e.apply();
+    }
+
+    public int getMode(Context ctx) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return sharedPreferences.getInt(MODE, 0);
     }
 }

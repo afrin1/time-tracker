@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App Usage Tracker</string>
+    <string name="app_name">Usage Tracker</string>
     <string name="daily_stats">Today</string>
     <string name="yesterday_stats">Yesterday</string>
     <string name="weekly_stats">Week</string>
@@ -26,4 +26,7 @@
     <string name="no_data">Select apps from Settings screen to view its usage info</string>
     <!--<string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>  &lt;!&ndash;// //add test&ndash;&gt;-->
     <string name="adUnitId">ca-app-pub-3912594581926590/5234837081</string>
+
+    <string name="app">App</string>
+    <string name="network">Network</string>
 </resources>

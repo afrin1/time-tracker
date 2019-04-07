@@ -17,7 +17,7 @@ android {
                     "$project.rootDir/app/proguard-rules.pro"
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     "$project.rootDir/app/proguard-rules.pro"
         }
