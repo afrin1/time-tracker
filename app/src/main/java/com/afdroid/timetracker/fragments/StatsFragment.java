@@ -313,7 +313,7 @@ public class StatsFragment extends Fragment {
                 set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Hours" : "MB"));
             }
             set1.setDrawIcons(false);
-            set1.setColors(ColorTemplate.MATERIAL_COLORS);
+            set1.setColors(ColorTemplate.LIBERTY_COLORS);
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
             dataSets.add(set1);
             BarData data = new BarData(dataSets);

@@ -11,11 +11,30 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!--   your app branding color for the app bar -->
-        <item name="colorPrimary">#3F51B5</item>
+        <!--<item name="colorPrimary">#3F51B5</item>-->
+        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
+        <!--<item name="colorPrimaryDark">#303F9F</item>-->
+        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
+        <!--<item name="colorAccent">#FF4081</item>-->
+
+        <!--<item name="colorPrimary">#9965F4</item>-->
+        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
+        <!--<item name="colorPrimaryDark">#D4BFF9</item>-->
+        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
+        <!--<item name="colorAccent">#AAF255</item>-->
+
+        <item name="colorPrimaryDark">#EF0078</item>
         <!--   darker variant for the status bar and contextual app bars -->
-        <item name="colorPrimaryDark">#303F9F</item>
+        <item name="colorPrimary">#EE0290</item>
         <!--   theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">#FF4081</item>
+        <item name="colorAccent">#FF9E22</item>
+
+        <!--<item name="colorPrimaryDark">#5300E8</item>-->
+        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
+        <!--<item name="colorPrimary">#6002EE</item>-->
+        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
+        <!--<item name="colorAccent">#AAF255</item>-->
+
     </style>
 
 
