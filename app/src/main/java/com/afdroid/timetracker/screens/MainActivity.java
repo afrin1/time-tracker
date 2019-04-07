@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
 
         mainTabLayout = (TabLayout) findViewById(R.id.main_tab_layout);
-//        mainViewPager = (ViewPager) findViewById(R.id.pager);
 
         prefList = new LinkedList<String>();
 

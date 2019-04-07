@@ -29,4 +29,6 @@
 
     <string name="app">App</string>
     <string name="network">Network</string>
+    <string name="network_stats">Network Stats</string>
+    <string name="networks_stats_na">Sorry. This feature is not available for you Android Version.</string>
 </resources>

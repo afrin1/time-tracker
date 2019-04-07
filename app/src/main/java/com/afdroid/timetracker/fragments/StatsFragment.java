@@ -1,10 +1,12 @@
 package com.afdroid.timetracker.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.app.usage.UsageStats;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -60,9 +62,13 @@ public class StatsFragment extends Fragment {
     private List<String> appList = null;
     private List<String> appNameList = null;
 
+    private Context context;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Log.e("NETWORK_USAGE", "createview");
+        context = getActivity().getApplicationContext();
         rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         Bundle args = getArguments();
         selectedPeriod = args.getInt("period", 0);
@@ -76,15 +82,27 @@ public class StatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mode = TimeTrackerPrefHandler.INSTANCE.getMode(getActivity().getApplicationContext());
-        String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList
-                (getActivity().getApplicationContext());
+        Log.e("NETWORK_USAGE", "resume");
+        mode = TimeTrackerPrefHandler.INSTANCE.getMode(context);
+        String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(context);
         if (serialized != null) {
             appList = null;
             appNameList = null;
             appList = new LinkedList<String>(Arrays.asList(TextUtils.
                     split(serialized, ",")));
             appNameList = new LinkedList<String>();
+        }
+        if (mode == 1 && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.network_stats)
+                    .setMessage(R.string.networks_stats_na)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
         }
         getStatsInfo();
     }
@@ -136,7 +154,7 @@ public class StatsFragment extends Fragment {
         endTime.setText("To " + sdf.format(endresultdate));
 
         if (appList != null) {
-            PackageManager packageManager = getActivity().getApplicationContext().getPackageManager();
+            PackageManager packageManager = context.getPackageManager();
             ArrayList<Float> values = new ArrayList<Float>();
             ApplicationInfo info = null;
 
@@ -164,7 +182,7 @@ public class StatsFragment extends Fragment {
                         NetworkStatsManager networkStatsManager;
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            networkStatsManager = (NetworkStatsManager) getActivity().getApplicationContext().getSystemService(Context.NETWORK_STATS_SERVICE);
+                            networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
                             NetworkStats nwStats = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null, millis, System.currentTimeMillis(), uid);
                             NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                             nwStats.getNextBucket(bucket);
@@ -183,6 +201,8 @@ public class StatsFragment extends Fragment {
                             values.add(((float) totalAll));
 
 //                        Log.e("NETWORK_USAGE", "appname : "+appname+ " : "+String.format("%.2f", totalAll) + " MB");
+                        } else {
+                            values.add(0.0f);
                         }
                     } else {
                         if (lUsageStatsMap.containsKey(appPkg)) {
@@ -217,7 +237,7 @@ public class StatsFragment extends Fragment {
 
     private void saveAppPreference() {
         TimeTrackerPrefHandler.INSTANCE.savePkgList
-                (TextUtils.join(",", appList), getActivity().getApplicationContext());
+                (TextUtils.join(",", appList), context);
     }
 
     private void setChart(ArrayList<Float> values) {
