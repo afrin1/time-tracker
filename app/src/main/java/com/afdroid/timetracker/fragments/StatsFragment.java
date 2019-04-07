@@ -93,18 +93,21 @@ public class StatsFragment extends Fragment {
             appNameList = new LinkedList<String>();
         }
         if (mode == 1 && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.network_stats)
-                    .setMessage(R.string.networks_stats_na)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Continue with delete operation
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+           showAlert();
         }
         getStatsInfo();
+    }
+
+    private void showAlert() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.network_stats)
+                .setMessage(R.string.networks_stats_na)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     private void getStatsInfo() {
