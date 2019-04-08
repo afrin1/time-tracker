@@ -17,23 +17,11 @@
         <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
         <!--<item name="colorAccent">#FF4081</item>-->
 
-        <!--<item name="colorPrimary">#9965F4</item>-->
-        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
-        <!--<item name="colorPrimaryDark">#D4BFF9</item>-->
-        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
-        <!--<item name="colorAccent">#AAF255</item>-->
-
-        <item name="colorPrimaryDark">#EF0078</item>
+        <item name="colorPrimaryDark">#A178EC</item>
         <!--   darker variant for the status bar and contextual app bars -->
-        <item name="colorPrimary">#EE0290</item>
+        <item name="colorPrimary">#9764F3</item>
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">#FF9E22</item>
-
-        <!--<item name="colorPrimaryDark">#5300E8</item>-->
-        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
-        <!--<item name="colorPrimary">#6002EE</item>-->
-        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
-        <!--<item name="colorAccent">#AAF255</item>-->
 
     </style>
 

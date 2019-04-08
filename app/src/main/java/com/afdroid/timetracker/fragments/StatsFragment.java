@@ -93,7 +93,7 @@ public class StatsFragment extends Fragment {
             appNameList = new LinkedList<String>();
         }
         if (mode == 1 && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
-           showAlert();
+            showAlert();
         }
         getStatsInfo();
     }
@@ -178,32 +178,41 @@ public class StatsFragment extends Fragment {
                 if (appname != null) {
                     appNameList.add(appname);
 
-
                     if (mode == 1) {
                         // network test
                         uid = info.uid;
                         NetworkStatsManager networkStatsManager;
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            float receivedWifi = 0;
+                            float sentWifi = 0;
+                            float receivedMobData = 0;
+                            float sentMobData = 0;
+
                             networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
-                            NetworkStats nwStats = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null, millis, System.currentTimeMillis(), uid);
-                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-                            nwStats.getNextBucket(bucket);
-                            double received = (double) bucket.getRxBytes() / (1024 * 1024);
-                            double send = (double) bucket.getTxBytes() / (1024 * 1024);
-                            double total = received + send;
+                            NetworkStats nwStatsWifi = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null,
+                                    millis, System.currentTimeMillis(), uid);
+                            NetworkStats.Bucket bucketWifi = new NetworkStats.Bucket();
+                            while(nwStatsWifi.hasNextBucket()) {
+                                nwStatsWifi.getNextBucket(bucketWifi);
+                                receivedWifi = receivedWifi + bucketWifi.getRxBytes();
+                                sentWifi = sentWifi + bucketWifi.getTxBytes();
+                            }
 
-                            NetworkStats nwStats1 = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null, millis, System.currentTimeMillis(), uid);
-                            NetworkStats.Bucket bucket1 = new NetworkStats.Bucket();
-                            nwStats1.getNextBucket(bucket1);
-                            double received1 = (double) bucket1.getRxBytes() / (1024 * 1024);
-                            double send1 = (double) bucket1.getTxBytes() / (1024 * 1024);
-                            double total1 = received1 + send1;
-                            double totalAll = total + total1;
+                            NetworkStats nwStatsMobData = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null,
+                                    millis, System.currentTimeMillis(), uid);
+                            NetworkStats.Bucket bucketMobData = new NetworkStats.Bucket();
+                            while(nwStatsMobData.hasNextBucket()) {
+                                nwStatsMobData.getNextBucket(bucketMobData);
+                                receivedMobData = receivedMobData + bucketMobData.getRxBytes() ;
+                                sentMobData = sentMobData + bucketMobData.getTxBytes();
+                            }
 
-                            values.add(((float) totalAll));
+                            float total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024);
 
-//                        Log.e("NETWORK_USAGE", "appname : "+appname+ " : "+String.format("%.2f", totalAll) + " MB");
+                            values.add(total);
+
+                            Log.e("NETWORK_USAGE", " period : " + selectedPeriod + "appname : " + appname + " : " + String.format("%.2f", total) + " MB");
                         } else {
                             values.add(0.0f);
                         }
@@ -229,9 +238,6 @@ public class StatsFragment extends Fragment {
                 }
             }
             saveAppPreference();
-            Log.d(AppHelper.TAG, "applist size - " + appList.size());
-            Log.d(AppHelper.TAG, "appnamelist size - " + appNameList.size());
-            Log.d(AppHelper.TAG, "values size - " + values.size());
             if (values.size() != 0) {
                 setChart(values);
             }

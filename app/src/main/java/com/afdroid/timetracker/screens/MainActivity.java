@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
     private void hideTutorialView() {
         tutorialView.setVisibility(View.INVISIBLE);
         toolbar.setVisibility(View.VISIBLE);
+        mainTabLayout.setVisibility(View.VISIBLE);
         tabLayout.setVisibility(View.VISIBLE);
         viewPager.setVisibility(View.VISIBLE);
     }
@@ -245,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
     private void showTutorialView() {
         tutorialView.setVisibility(View.VISIBLE);
         toolbar.setVisibility(View.INVISIBLE);
+        mainTabLayout.setVisibility(View.INVISIBLE);
         tabLayout.setVisibility(View.INVISIBLE);
         viewPager.setVisibility(View.INVISIBLE);
     }
