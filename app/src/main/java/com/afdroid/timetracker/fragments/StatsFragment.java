@@ -66,8 +66,6 @@ public class StatsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        Log.e("NETWORK_USAGE", "createview");
         context = getActivity().getApplicationContext();
         rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         Bundle args = getArguments();
@@ -116,42 +114,41 @@ public class StatsFragment extends Fragment {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        long millis = 0;
+        long startMillis = 0;
+        long endMillis = System.currentTimeMillis();
 
         Date endresultdate = new Date(System.currentTimeMillis());
         switch (selectedPeriod) {
             case DAILY:
-                millis = calendar.getTimeInMillis();
+                startMillis = calendar.getTimeInMillis();
                 break;
             case YESTERDAY:
                 calendar.set(Calendar.HOUR_OF_DAY, -24);
-                millis = calendar.getTimeInMillis();
+                startMillis = calendar.getTimeInMillis();
                 calendar.set(Calendar.HOUR_OF_DAY, 23);
                 calendar.set(Calendar.MINUTE, 59);
                 calendar.set(Calendar.SECOND, 59);
                 calendar.set(Calendar.MILLISECOND, 99);
-                Date date = calendar.getTime();
-                endresultdate = date;
+                endMillis = calendar.getTimeInMillis();
+                endresultdate = calendar.getTime();
                 break;
             case WEEKLY:
                 calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
-                millis = calendar.getTimeInMillis();
+                startMillis = calendar.getTimeInMillis();
                 break;
             case MONTHLY:
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
-                millis = calendar.getTimeInMillis();
+                startMillis = calendar.getTimeInMillis();
                 break;
             default:
                 break;
         }
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-        Date startresultdate = new Date(millis);
+        Date startresultdate = new Date(startMillis);
 
         Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
-                queryAndAggregateUsageStats(
-                        millis,
-                        System.currentTimeMillis());
+                queryAndAggregateUsageStats(startMillis, endMillis);
 
         startTime.setText("From " + sdf.format(startresultdate));
         endTime.setText("To " + sdf.format(endresultdate));
@@ -191,7 +188,7 @@ public class StatsFragment extends Fragment {
 
                             networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
                             NetworkStats nwStatsWifi = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null,
-                                    millis, System.currentTimeMillis(), uid);
+                                    startMillis, endMillis, uid);
                             NetworkStats.Bucket bucketWifi = new NetworkStats.Bucket();
                             while(nwStatsWifi.hasNextBucket()) {
                                 nwStatsWifi.getNextBucket(bucketWifi);
@@ -200,7 +197,7 @@ public class StatsFragment extends Fragment {
                             }
 
                             NetworkStats nwStatsMobData = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null,
-                                    millis, System.currentTimeMillis(), uid);
+                                    startMillis, endMillis, uid);
                             NetworkStats.Bucket bucketMobData = new NetworkStats.Bucket();
                             while(nwStatsMobData.hasNextBucket()) {
                                 nwStatsMobData.getNextBucket(bucketMobData);
@@ -208,17 +205,20 @@ public class StatsFragment extends Fragment {
                                 sentMobData = sentMobData + bucketMobData.getTxBytes();
                             }
 
-                            float total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024);
-
+                            float total = 0;
+                            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
+                                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024);
+                            } else {
+                                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024 * 1024);
+                            }
                             values.add(total);
 
-                            Log.e("NETWORK_USAGE", " period : " + selectedPeriod + "appname : " + appname + " : " + String.format("%.2f", total) + " MB");
                         } else {
                             values.add(0.0f);
                         }
                     } else {
                         if (lUsageStatsMap.containsKey(appPkg)) {
-                            if (selectedPeriod == DAILY) {
+                            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
                                 values.add(AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
                                         getTotalTimeInForeground()));
                             } else {
@@ -313,10 +313,10 @@ public class StatsFragment extends Fragment {
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
         } else {
-            if (selectedPeriod == DAILY) {
+            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
                 set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Minutes" : "MB"));
             } else {
-                set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Hours" : "MB"));
+                set1 = new BarDataSet(yVals1, ((mode == 0) ? "App" : "Network") + " usage in " + ((mode == 0) ? "Hours" : "GB"));
             }
             set1.setDrawIcons(false);
             set1.setColors(ColorTemplate.LIBERTY_COLORS);
