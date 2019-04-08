@@ -15,6 +15,7 @@ public class AppHelper {
     public final static int YESTERDAY_STATS = 1;
     public final static int WEEKLY_STATS = 2;
     public final static int MONTHLY_STATS = 3;
+    public final static int NETWORK_MODE = 1;
 
     private static UsageStatsManager mUsageStatsManager;
 

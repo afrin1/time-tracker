@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +55,7 @@ public class StatsFragment extends Fragment {
     private final int YESTERDAY = AppHelper.YESTERDAY_STATS;
     private final int WEEKLY = AppHelper.WEEKLY_STATS;
     private final int MONTHLY = AppHelper.MONTHLY_STATS;
+    private final int NETWORK_MODE = AppHelper.NETWORK_MODE;
 
     private int selectedPeriod = 0;
     private int mode = 0;
@@ -80,7 +80,6 @@ public class StatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("NETWORK_USAGE", "resume");
         mode = TimeTrackerPrefHandler.INSTANCE.getMode(context);
         String serialized = TimeTrackerPrefHandler.INSTANCE.getPkgList(context);
         if (serialized != null) {
@@ -146,13 +145,13 @@ public class StatsFragment extends Fragment {
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date startresultdate = new Date(startMillis);
-
-        Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
-                queryAndAggregateUsageStats(startMillis, endMillis);
-
         startTime.setText("From " + sdf.format(startresultdate));
         endTime.setText("To " + sdf.format(endresultdate));
 
+        setUsageInfo(startMillis, endMillis);
+    }
+
+    private void setUsageInfo(long startMillis, long endMillis) {
         if (appList != null) {
             PackageManager packageManager = context.getPackageManager();
             ArrayList<Float> values = new ArrayList<Float>();
@@ -171,67 +170,15 @@ public class StatsFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-
                 if (appname != null) {
                     appNameList.add(appname);
-
-                    if (mode == 1) {
-                        // network test
+                    if (mode == NETWORK_MODE) {
                         uid = info.uid;
-                        NetworkStatsManager networkStatsManager;
+                        values.add(fetchNetworkStatsInfo(startMillis, endMillis, uid));
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            float receivedWifi = 0;
-                            float sentWifi = 0;
-                            float receivedMobData = 0;
-                            float sentMobData = 0;
-
-                            networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
-                            NetworkStats nwStatsWifi = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null,
-                                    startMillis, endMillis, uid);
-                            NetworkStats.Bucket bucketWifi = new NetworkStats.Bucket();
-                            while(nwStatsWifi.hasNextBucket()) {
-                                nwStatsWifi.getNextBucket(bucketWifi);
-                                receivedWifi = receivedWifi + bucketWifi.getRxBytes();
-                                sentWifi = sentWifi + bucketWifi.getTxBytes();
-                            }
-
-                            NetworkStats nwStatsMobData = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null,
-                                    startMillis, endMillis, uid);
-                            NetworkStats.Bucket bucketMobData = new NetworkStats.Bucket();
-                            while(nwStatsMobData.hasNextBucket()) {
-                                nwStatsMobData.getNextBucket(bucketMobData);
-                                receivedMobData = receivedMobData + bucketMobData.getRxBytes() ;
-                                sentMobData = sentMobData + bucketMobData.getTxBytes();
-                            }
-
-                            float total = 0;
-                            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
-                                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024);
-                            } else {
-                                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024 * 1024);
-                            }
-                            values.add(total);
-
-                        } else {
-                            values.add(0.0f);
-                        }
                     } else {
-                        if (lUsageStatsMap.containsKey(appPkg)) {
-                            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
-                                values.add(AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
-                                        getTotalTimeInForeground()));
-                            } else {
-                                values.add(AppHelper.getHours(lUsageStatsMap.get(appPkg).
-                                        getTotalTimeInForeground()));
-                            }
-
-                        } else {
-                            //if device does not contain the app usage data
-                            values.add(0.0f);
-                        }
+                        values.add(fetchAppStatsInfo(startMillis, endMillis, appPkg));
                     }
-
 
                 } else {
                     appList.remove(appPkg);
@@ -242,6 +189,59 @@ public class StatsFragment extends Fragment {
                 setChart(values);
             }
         }
+    }
+
+    private float fetchAppStatsInfo(long startMillis, long endMillis, String appPkg) {
+        Map<String, UsageStats> lUsageStatsMap = AppHelper.getUsageStatsManager().
+                queryAndAggregateUsageStats(startMillis, endMillis);
+        float total = 0.0f;
+        if (lUsageStatsMap.containsKey(appPkg)) {
+            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
+                total = (AppHelper.getMinutes(lUsageStatsMap.get(appPkg).
+                        getTotalTimeInForeground()));
+            } else {
+                total = (AppHelper.getHours(lUsageStatsMap.get(appPkg).
+                        getTotalTimeInForeground()));
+            }
+        }
+        return total;
+    }
+
+    private float fetchNetworkStatsInfo(long startMillis, long endMillis, int uid) {
+        NetworkStatsManager networkStatsManager;
+        float total = 0.0f;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            float receivedWifi = 0;
+            float sentWifi = 0;
+            float receivedMobData = 0;
+            float sentMobData = 0;
+
+            networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
+            NetworkStats nwStatsWifi = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_WIFI, null,
+                    startMillis, endMillis, uid);
+            NetworkStats.Bucket bucketWifi = new NetworkStats.Bucket();
+            while (nwStatsWifi.hasNextBucket()) {
+                nwStatsWifi.getNextBucket(bucketWifi);
+                receivedWifi = receivedWifi + bucketWifi.getRxBytes();
+                sentWifi = sentWifi + bucketWifi.getTxBytes();
+            }
+
+            NetworkStats nwStatsMobData = networkStatsManager.queryDetailsForUid(ConnectivityManager.TYPE_MOBILE, null,
+                    startMillis, endMillis, uid);
+            NetworkStats.Bucket bucketMobData = new NetworkStats.Bucket();
+            while (nwStatsMobData.hasNextBucket()) {
+                nwStatsMobData.getNextBucket(bucketMobData);
+                receivedMobData = receivedMobData + bucketMobData.getRxBytes();
+                sentMobData = sentMobData + bucketMobData.getTxBytes();
+            }
+
+            if (selectedPeriod == DAILY || selectedPeriod == YESTERDAY) {
+                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024);
+            } else {
+                total = (receivedWifi + sentWifi + receivedMobData + sentMobData) / (1024 * 1024 * 1024);
+            }
+        }
+        return total;
     }
 
     private void saveAppPreference() {
