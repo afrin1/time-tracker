@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Usage Tracker</string>
+    <string name="app_name">App Usage Tracker</string>
     <string name="daily_stats">Today</string>
     <string name="yesterday_stats">Yesterday</string>
     <string name="weekly_stats">Week</string>

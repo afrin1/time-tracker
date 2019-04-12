@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#88303F9F">
+    android:background="#99FF9E22">
 
     <Button
         android:layout_width="30dp"
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:textSize="15dp"
+            android:textSize="18sp"
             android:textColor="#ffffff"
             android:layout_below="@+id/steps"
             android:text="@string/step_1"/>
@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:textSize="15dp"
+            android:textSize="18sp"
             android:textColor="#ffffff"
             android:layout_below="@+id/step_1"
             android:text="@string/step_2"/>
@@ -57,7 +57,7 @@
             android:text="@string/step_3"
             android:textColor="#ffffff"
             android:layout_margin="10dp"
-            android:textSize="15dp"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/step_4"
@@ -67,7 +67,7 @@
             android:text="@string/step_4"
             android:textColor="#ffffff"
             android:layout_margin="10dp"
-            android:textSize="15dp"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/step_5"
@@ -77,7 +77,7 @@
             android:text="@string/step_5"
             android:textColor="#ffffff"
             android:layout_margin="10dp"
-            android:textSize="15dp"/>
+            android:textSize="18sp"/>
     </RelativeLayout>
 
 </RelativeLayout>

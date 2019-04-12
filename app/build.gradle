@@ -7,8 +7,8 @@ android {
         applicationId 'com.afdroid.timetracker'
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 6
-        versionName "2.4"
+        versionCode 9
+        versionName "3"
     }
     buildTypes {
         release {
