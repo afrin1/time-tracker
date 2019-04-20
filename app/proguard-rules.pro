@@ -26,5 +26,6 @@
     public static int d(...);
     public static int e(...);
 }
--keep class android.support.v7.widget.SearchView { *; }
+
+-keep class android.support.v7.widget.** { *; }
 
